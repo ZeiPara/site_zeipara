@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ファイル作成とダウンロード</title>
+</head>
+<body>
+    <h1>ファイル作成とダウンロード</h1>
+
+    <!-- 入力フォーム -->
+    <form id="data-form">
+        <label for="input-text">入力欄:</label>
+        <input type="text" id="input-text" name="input-text" required>
+        <br><br>
+
+        <label for="checkbox">チェックボックス:</label>
+        <input type="checkbox" id="checkbox" name="checkbox">
+        <br><br>
+
+        <button type="button" id="create-button">作成</button>
+    </form>
+
+    <!-- ダウンロードリンク -->
+    <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
+
+    <script>
+        document.getElementById('create-button').addEventListener('click', function() {
+            // 入力データを取得
+            const inputText = document.getElementById('input-text').value;
+            const checkboxChecked = document.getElementById('checkbox').checked ? 1 : 0;
+
+            // テキストファイルの内容を作成
+            const fileContent = `入力された文字列: ${inputText}\nチェックボックス: ${checkboxChecked}`;
+
+            // Blobを作成して、ファイルデータを保持
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+
+            // ダウンロードリンクを設定
+            const downloadLink = document.getElementById('download-link');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = '結果.txt';
+            downloadLink.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
