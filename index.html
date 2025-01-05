@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ファイル作成とダウンロード</title>
+    <title>ZIPファイル作成とダウンロード</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-    <h1>ファイル作成とダウンロード</h1>
+    <h1>ZIPファイル作成とダウンロード</h1>
 
     <!-- 入力フォーム -->
     <form id="data-form">
@@ -18,30 +19,35 @@
         <input type="checkbox" id="checkbox" name="checkbox">
         <br><br>
 
-        <button type="button" id="create-button">作成</button>
+        <button type="button" id="create-zip">ZIP作成</button>
     </form>
 
     <!-- ダウンロードリンク -->
     <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
 
     <script>
-        document.getElementById('create-button').addEventListener('click', function() {
+        document.getElementById('create-zip').addEventListener('click', async function() {
             // 入力データを取得
             const inputText = document.getElementById('input-text').value;
             const checkboxChecked = document.getElementById('checkbox').checked ? 1 : 0;
 
-            // テキストファイルの内容を作成
-            const fileContent = `入力された文字列: ${inputText}\nチェックボックス: ${checkboxChecked}`;
+            // JSZipのインスタンスを作成
+            const zip = new JSZip();
 
-            // Blobを作成して、ファイルデータを保持
-            const blob = new Blob([fileContent], { type: 'text/plain' });
+            // ファイルをZIPに追加
+            zip.file("入力内容.txt", `入力された文字列: ${inputText}`);
+            zip.file("チェックボックス.txt", `チェックボックスの値: ${checkboxChecked}`);
+
+            // ZIPファイルを生成
+            const zipBlob = await zip.generateAsync({ type: "blob" });
 
             // ダウンロードリンクを設定
             const downloadLink = document.getElementById('download-link');
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = '結果.txt';
+            downloadLink.href = URL.createObjectURL(zipBlob);
+            downloadLink.download = '結果.zip';
             downloadLink.style.display = 'block';
         });
     </script>
 </body>
 </html>
+
