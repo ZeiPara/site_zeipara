@@ -3,40 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZIPファイル作成とダウンロード</title>
+    <title>ZIPファイル生成</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-    <h1>ZIPファイル作成とダウンロード</h1>
+    <h1>ZIPファイル生成</h1>
 
-    <!-- 入力フォーム -->
     <form id="data-form">
-        <label for="input-text">入力欄:</label>
-        <input type="text" id="input-text" name="input-text" required>
-        <br><br>
+        <label for="name">名前:</label>
+        <input type="text" id="name" required><br><br>
 
-        <label for="checkbox">チェックボックス:</label>
-        <input type="checkbox" id="checkbox" name="checkbox">
-        <br><br>
+        <label for="english-name">英語のパックの名前:</label>
+        <input type="text" id="english-name" required><br><br>
+
+        <label for="description">説明:</label>
+        <input type="text" id="description" required><br><br>
+
+        <label for="item-name">アイテムの名前:</label>
+        <input type="text" id="item-name" required><br><br>
+
+        <label for="item-english-name">英語のアイテムの名前:</label>
+        <input type="text" id="item-english-name" required><br><br>
 
         <button type="button" id="create-zip">ZIP作成</button>
     </form>
 
-    <!-- ダウンロードリンク -->
     <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
 
     <script>
-        document.getElementById('create-zip').addEventListener('click', async function() {
+        // UUID生成関数
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        document.getElementById('create-zip').addEventListener('click', async function () {
             // 入力データを取得
-            const inputText = document.getElementById('input-text').value;
-            const checkboxChecked = document.getElementById('checkbox').checked ? 1 : 0;
+            const name = document.getElementById('name').value;
+            const englishName = document.getElementById('english-name').value;
+            const description = document.getElementById('description').value;
+            const itemName = document.getElementById('item-name').value;
+            const itemEnglishName = document.getElementById('item-english-name').value;
+
+            // UUIDを生成
+            const UUIDA = generateUUID();
+            const UUIDB = generateUUID();
+            const UUIDC = generateUUID();
+            const UUIDD = generateUUID();
 
             // JSZipのインスタンスを作成
             const zip = new JSZip();
 
-            // ファイルをZIPに追加
-            zip.file("入力内容.txt", `入力された文字列: ${inputText}`);
-            zip.file("チェックボックス.txt", `チェックボックスの値: ${checkboxChecked}`);
+            // RPフォルダの構成
+            const rp = zip.folder("RP");
+            rp.file("manifest.json", JSON.stringify({
+                "format_version": 2,
+                "header": {
+                    "description": description,
+                    "name": name,
+                    "uuid": UUIDA,
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 19, 0]
+                },
+                "modules": [
+                    {
+                        "description": description,
+                        "type": "data",
+                        "uuid": UUIDB,
+                        "version": [1, 0, 0]
+                    }
+                ],
+                "dependencies": [
+                    {
+                        "uuid": UUIDD,
+                        "version": [1, 0, 0]
+                    }
+                ]
+            }, null, 2));
+            const rpTextures = rp.folder("textures");
+            rpTextures.folder("items");
+            rpTextures.file("item_texture.json", JSON.stringify({
+                "resource_pack_name": englishName,
+                "texture_name": "atlas.items",
+                "texture_data": {
+                    [itemEnglishName]: {
+                        "textures": `textures/items/${itemEnglishName}`
+                    }
+                }
+            }, null, 2));
+
+            // BPフォルダの構成
+            const bp = zip.folder("BP");
+            bp.file("manifest.json", JSON.stringify({
+                "format_version": 2,
+                "header": {
+                    "description": description,
+                    "name": name,
+                    "uuid": UUIDC,
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 19, 0]
+                },
+                "modules": [
+                    {
+                        "description": description,
+                        "type": "data",
+                        "uuid": UUIDD,
+                        "version": [1, 0, 0]
+                    }
+                ],
+                "dependencies": [
+                    {
+                        "uuid": UUIDB,
+                        "version": [1, 0, 0]
+                    }
+                ]
+            }, null, 2));
+            const bpItems = bp.folder("items");
+            bpItems.file(`${itemName}.json`, JSON.stringify({
+                "format_version": "1.21.10",
+                "minecraft:item": {
+                    "description": {
+                        "identifier": `${englishName}:${itemEnglishName}`,
+                        "menu_category": {
+                            "category": "construction"
+                        }
+                    },
+                    "components": {
+                        "minecraft:max_stack_size": 64,
+                        "minecraft:icon": itemEnglishName,
+                        "minecraft:display_name": {
+                            "value": itemName
+                        }
+                    }
+                }
+            }, null, 2));
 
             // ZIPファイルを生成
             const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -44,10 +146,9 @@
             // ダウンロードリンクを設定
             const downloadLink = document.getElementById('download-link');
             downloadLink.href = URL.createObjectURL(zipBlob);
-            downloadLink.download = '結果.zip';
+            downloadLink.download = `${name}_pack.zip`;
             downloadLink.style.display = 'block';
         });
     </script>
 </body>
 </html>
-
