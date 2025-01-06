@@ -60,8 +60,15 @@
 
                 <label for="item-image">アイテムの画像(サイズは16の倍数の正方形):</label>
                 <input type="file" class="item-image" required><br><br>
+
+                <button type="button" class="remove-item">削除</button><br><br>
             `;
             document.getElementById('items-container').appendChild(itemContainer);
+
+            // 削除ボタンにイベントリスナーを追加
+            itemContainer.querySelector('.remove-item').addEventListener('click', function() {
+                itemContainer.remove();
+            });
         });
 
         document.getElementById('create-mcaddon').addEventListener('click', async function () {
