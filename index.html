@@ -61,28 +61,28 @@
             const rpZip = new JSZip();
             const rp = rpZip.folder("RP");
             rp.file("manifest.json", JSON.stringify({
-                "format_version": 2,
-                "header": {
-                    "description": description,
-                    "name": name,
-                    "uuid": UUIDA,
-                    "version": [1, 0, 0],
-                    "min_engine_version": [1, 19, 0]
-                },
-                "modules": [
-                    {
-                        "description": description,
-                        "type": "data",
-                        "uuid": UUIDB,
-                        "version": [1, 0, 0]
-                    }
-                ],
-                "dependencies": [
-                    {
-                        "uuid": UUIDC,
-                        "version": [1, 0, 0]
-                    }
-                ]
+                "format_version": 1,
+                "header": {
+                    "description": description,
+                    "name": name,
+                    "uuid": UUIDA,
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 19, 0]
+                },
+                "modules": [
+                    {
+                        "description": description,
+                        "type": "resources",
+                        "uuid": UUIDB,
+                        "version": [1, 0, 0]
+                    }
+                ],
+                 "dependencies": [
+                {
+                 "uuid":UUIDC,
+                  "version":[1,0,0]
+                }
+             ]
             }, null, 2));
             const rpTextures = rp.folder("textures");
             const texturesItems = rpTextures.folder("items");
