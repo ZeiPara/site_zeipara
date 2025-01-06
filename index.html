@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZIPファイル生成</title>
+    <title>MCAddonファイル生成</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-    <h1>ZIPファイル生成</h1>
+    <h1>MCAddonファイル生成</h1>
 
     <form id="data-form">
         <label for="name">名前:</label>
@@ -25,7 +25,10 @@
         <label for="item-english-name">英語のアイテムの名前:</label>
         <input type="text" id="item-english-name" required><br><br>
 
-        <button type="button" id="create-zip">ZIP作成</button>
+        <label for="item-image">アイテムの画像(サイズは16の倍数の正方形):</label>
+        <input type="file" id="item-image" required><br><br>
+
+        <button type="button" id="create-mcaddon">MCAddon作成</button>
     </form>
 
     <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
@@ -39,13 +42,14 @@
             });
         }
 
-        document.getElementById('create-zip').addEventListener('click', async function () {
+        document.getElementById('create-mcaddon').addEventListener('click', async function () {
             // 入力データを取得
             const name = document.getElementById('name').value;
             const englishName = document.getElementById('english-name').value;
             const description = document.getElementById('description').value;
             const itemName = document.getElementById('item-name').value;
             const itemEnglishName = document.getElementById('item-english-name').value;
+            const itemImageFile = document.getElementById('item-image').files[0];
 
             // UUIDを生成
             const UUIDA = generateUUID();
@@ -53,11 +57,9 @@
             const UUIDC = generateUUID();
             const UUIDD = generateUUID();
 
-            // JSZipのインスタンスを作成
-            const zip = new JSZip();
-
-            // RPフォルダの構成
-            const rp = zip.folder("RP");
+            // RP ZIPファイルの生成
+            const rpZip = new JSZip();
+            const rp = rpZip.folder("RP");
             rp.file("manifest.json", JSON.stringify({
                 "format_version": 2,
                 "header": {
@@ -83,7 +85,8 @@
                 ]
             }, null, 2));
             const rpTextures = rp.folder("textures");
-            rpTextures.folder("items");
+            const texturesItems = rpTextures.folder("items");
+            texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
             rpTextures.file("item_texture.json", JSON.stringify({
                 "resource_pack_name": englishName,
                 "texture_name": "atlas.items",
@@ -94,8 +97,9 @@
                 }
             }, null, 2));
 
-            // BPフォルダの構成
-            const bp = zip.folder("BP");
+            // BP ZIPファイルの生成
+            const bpZip = new JSZip();
+            const bp = bpZip.folder("BP");
             bp.file("manifest.json", JSON.stringify({
                 "format_version": 2,
                 "header": {
@@ -140,13 +144,25 @@
                 }
             }, null, 2));
 
-            // ZIPファイルを生成
-            const zipBlob = await zip.generateAsync({ type: "blob" });
+            // RP MCPACKファイルを生成
+            const rpZipBlob = await rpZip.generateAsync({ type: "blob" });
+            const rpMcpackBlob = new Blob([rpZipBlob], { type: "application/zip" });
+
+            // BP MCPACKファイルを生成
+            const bpZipBlob = await bpZip.generateAsync({ type: "blob" });
+            const bpMcpackBlob = new Blob([bpZipBlob], { type: "application/zip" });
+
+            // MCAddon ZIPファイルの生成
+            const mcaddonZip = new JSZip();
+            mcaddonZip.file(`${name}_RP.mcpack`, rpMcpackBlob);
+            mcaddonZip.file(`${name}_BP.mcpack`, bpMcpackBlob);
+
+            const mcaddonBlob = await mcaddonZip.generateAsync({ type: "blob" });
 
             // ダウンロードリンクを設定
             const downloadLink = document.getElementById('download-link');
-            downloadLink.href = URL.createObjectURL(zipBlob);
-            downloadLink.download = `${name}_pack.zip`;
+            downloadLink.href = URL.createObjectURL(mcaddonBlob);
+            downloadLink.download = `${name}.mcaddon`;
             downloadLink.style.display = 'block';
         });
     </script>
