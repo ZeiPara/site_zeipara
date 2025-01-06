@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-    <h1>統合版アイテム追加アドオン生成</h1>
+    <h1>MCAddonファイル生成</h1>
 
     <form id="data-form">
         <label for="name">名前:</label>
@@ -146,24 +146,31 @@
 
             // RP MCPACKファイルを生成
             const rpZipBlob = await rpZip.generateAsync({ type: "blob" });
-            const rpMcpackBlob = new Blob([rpZipBlob], { type: "application/zip" });
+            const rpMcpack = new Blob([rpZipBlob], { type: "application/zip" });
 
             // BP MCPACKファイルを生成
             const bpZipBlob = await bpZip.generateAsync({ type: "blob" });
-            const bpMcpackBlob = new Blob([bpZipBlob], { type: "application/zip" });
+            const bpMcpack = new Blob([bpZipBlob], { type: "application/zip" });
 
             // MCAddon ZIPファイルの生成
             const mcaddonZip = new JSZip();
-            mcaddonZip.file(`${name}_RP.mcpack`, rpMcpackBlob);
-            mcaddonZip.file(`${name}_BP.mcpack`, bpMcpackBlob);
+            mcaddonZip.file(`${name}_RP.mcpack`, rpMcpack);
+            mcaddonZip.file(`${name}_BP.mcpack`, bpMcpack);
 
             const mcaddonBlob = await mcaddonZip.generateAsync({ type: "blob" });
 
             // ダウンロードリンクを設定
             const downloadLink = document.getElementById('download-link');
-            downloadLink.href = URL.createObjectURL(mcaddonBlob);
-            downloadLink.download = `${name}.mcaddon`;
+            // BlobをオブジェクトURLとして作成
+            const mcaddonUrl = URL.createObjectURL(mcaddonBlob);
+            downloadLink.href = mcaddonUrl;
+            downloadLink.download = `${name}.mcaddon`; // ここで拡張子を.mcaddonに設定
             downloadLink.style.display = 'block';
+
+            // ダウンロード完了後、オブジェクトURLを解放
+            downloadLink.addEventListener('click', function () {
+                setTimeout(() => URL.revokeObjectURL(mcaddonUrl), 100);
+            });
         });
     </script>
 </body>
