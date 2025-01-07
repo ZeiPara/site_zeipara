@@ -2,31 +2,35 @@
 <html>
   <head>
     <style>
-      margin: 20px;
-      padding: 50px 10px 50px 10px;
-      
+      /* ヘッダーのスタイル */
       .Header {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 35px;
-        padding: 20px;
-        background-color: #31a9ee;
-        color: #000000;
+        height: 60px;
+        padding: 10px;
+        background-color: #31a9ee; /* ヘッダーの背景色 */
+        color: #000000; /* ヘッダー内の文字色 */
+        font-size: 20px; /* 文字サイズを調整 */
+        text-align: center; /* 中央揃え */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* 下に影をつける */
       }
+
+      /* コンテンツのスタイル */
       .Contents {
-        width: 100%;
-        overflow: auto;
+        margin-top: 80px; /* ヘッダーの高さ分だけ余白をつける */
+        padding: 20px;
+        font-family: Arial, sans-serif;
       }
     </style>
   </head>
   <body>
     <div class="Header">
-      <strong>ZeiParaのサイト</strong><br>
+      <strong>ZeiParaのサイト</strong>
     </div>
     <div class="Contents">
-      <h1>現在あるページ</h1><br>
+      <h1>現在あるページ</h1>
       <h3>マイクラ系</h3>
       <a href="https://zeipara.f5.si/mcaddon">【統合版･教育版対応】マイクラアイテム追加アドオン製造機</a>
     </div>
