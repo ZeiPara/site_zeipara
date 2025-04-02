@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF2解析</title>
+    <script type="module" src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <h1>SoundFont（.sf2）ファイル解析</h1>
+    <input type="file" id="fileInput" accept=".sf2">
+    <button onclick="readFile()">解析開始</button>
+    <pre id="output"></pre>
+
+    <script>
+        function readFile() {
+            const input = document.getElementById('fileInput');
+            if (input.files.length === 0) {
+                alert("ファイルを選択してください。");
+                return;
+            }
+
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                let arrayBuffer = event.target.result;
+                let byteArray = new Uint8Array(arrayBuffer);
+                pyscript.interpreter.globals.set("file_bytes", byteArray);
+                pyscript.run("parse_sf2()");
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+
+    <py-script>
+import js
+
+def parse_sf2():
+    file_bytes = js.file_bytes.to_py()
+    
+    if len(file_bytes) < 12:
+        js.document.getElementById("output").textContent = "ファイルが不正または小さすぎます。"
+        return
+    
+    riff_header = file_bytes[:4].decode("ascii")  # "RIFF"
+    file_size = int.from_bytes(file_bytes[4:8], "little")
+    file_type = file_bytes[8:12].decode("ascii")  # "sfbk"
+
+    output_text = f"Header: {riff_header}, File Size: {file_size}, File Type: {file_type}\n"
+
+    offset = 12
+    while offset < len(file_bytes):
+        if offset + 8 > len(file_bytes):
+            break
+        chunk_id = file_bytes[offset:offset+4].decode("ascii")
+        chunk_size = int.from_bytes(file_bytes[offset+4:offset+8], "little")
+        output_text += f"Chunk ID: {chunk_id}, Size: {chunk_size}\n"
+        offset += 8 + chunk_size
+
+    js.document.getElementById("output").textContent = output_text
+    </py-script>
+</body>
+</html>
