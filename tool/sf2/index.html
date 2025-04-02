@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF2解析</title>
-    
-    <!-- 安定版のPyScript（latestではなく、動作が確認されているバージョンを使用） -->
-    <link rel="stylesheet" href="https://pyscript.net/2023.05.1/pyscript.css">
-    <script type="module" src="https://pyscript.net/2023.05.1/pyscript.js"></script>
-
-    <!-- PyScriptの設定 -->
-    <py-config>
-        packages = []
-    </py-config>
+    <title>SF2解析 (Pyodide版)</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
     <h1>SoundFont（.sf2）ファイル解析</h1>
@@ -21,7 +13,16 @@
     <pre id="output"></pre>
 
     <script>
+        let pyodideReady = loadPyodide(); // Pyodideの読み込みを開始
+
+        async function loadPyodide() {
+            window.pyodide = await loadPyodide();
+            console.log("Pyodide is ready!");
+        }
+
         async function readFile() {
+            await pyodideReady; // Pyodideの準備ができるまで待つ
+            
             const input = document.getElementById('fileInput');
             if (input.files.length === 0) {
                 alert("ファイルを選択してください。");
@@ -33,14 +34,15 @@
             reader.onload = async function(event) {
                 let arrayBuffer = event.target.result;
                 let byteArray = new Uint8Array(arrayBuffer);
-
-                // PyScriptの実行を保証するために、Pythonコードを動的に実行
-                await pyscript.runPython(`
+                
+                // JavaScriptのバイト配列をPythonに渡す
+                await pyodide.runPythonAsync(`
+import sys
 from js import document
 
 def parse_sf2(file_bytes):
     file_bytes = bytes(file_bytes)  # JavaScriptの配列をPythonのbytesに変換
-    
+
     if len(file_bytes) < 12:
         document.getElementById("output").textContent = "ファイルが不正または小さすぎます。"
         return
@@ -62,6 +64,7 @@ def parse_sf2(file_bytes):
 
     document.getElementById("output").textContent = output_text
 
+# JavaScriptから渡されたバイト配列を使って解析を実行
 parse_sf2(${JSON.stringify(Array.from(byteArray))})
                 `);
             };
