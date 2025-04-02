@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SF2解析</title>
-    <script type="module" src="https://pyscript.net/latest/pyscript.js"></script>
+    
+    <!-- 安定版のPyScript（latestではなく、動作が確認されているバージョンを使用） -->
+    <link rel="stylesheet" href="https://pyscript.net/2023.05.1/pyscript.css">
+    <script type="module" src="https://pyscript.net/2023.05.1/pyscript.js"></script>
+
+    <!-- PyScriptの設定 -->
     <py-config>
-        packages = ["micropip"]
+        packages = []
     </py-config>
 </head>
 <body>
@@ -28,15 +33,9 @@
             reader.onload = async function(event) {
                 let arrayBuffer = event.target.result;
                 let byteArray = new Uint8Array(arrayBuffer);
-                
-                // PyScriptのrunメソッドでPython関数を呼び出し、引数としてbyteArrayを渡す
-                await pyscript.run("parse_sf2", { "file_bytes": byteArray });
-            };
-            reader.readAsArrayBuffer(file);
-        }
-    </script>
 
-    <py-script>
+                // PyScriptの実行を保証するために、Pythonコードを動的に実行
+                await pyscript.runPython(`
 from js import document
 
 def parse_sf2(file_bytes):
@@ -50,7 +49,7 @@ def parse_sf2(file_bytes):
     file_size = int.from_bytes(file_bytes[4:8], "little")
     file_type = file_bytes[8:12].decode("ascii")  # "sfbk"
 
-    output_text = f"Header: {riff_header}, File Size: {file_size}, File Type: {file_type}\n"
+    output_text = f"Header: {riff_header}, File Size: {file_size}, File Type: {file_type}\\n"
 
     offset = 12
     while offset < len(file_bytes):
@@ -58,10 +57,16 @@ def parse_sf2(file_bytes):
             break
         chunk_id = file_bytes[offset:offset+4].decode("ascii")
         chunk_size = int.from_bytes(file_bytes[offset+4:offset+8], "little")
-        output_text += f"Chunk ID: {chunk_id}, Size: {chunk_size}\n"
+        output_text += f"Chunk ID: {chunk_id}, Size: {chunk_size}\\n"
         offset += 8 + chunk_size
 
     document.getElementById("output").textContent = output_text
-    </py-script>
+
+parse_sf2(${JSON.stringify(Array.from(byteArray))})
+                `);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
 </body>
 </html>
