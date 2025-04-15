@@ -21,13 +21,13 @@
 
         <div id="skins-container">
             <div class="skin-entry">
-                <label for="skin-name">スキンの名前:</label>
+                <label>スキンの名前:</label>
                 <input type="text" class="skin-name" required><br><br>
 
-                <label for="skin-english-name">英語のスキンの名前:</label>
+                <label>英語のスキンの名前:</label>
                 <input type="text" class="skin-english-name" required><br><br>
 
-                <label for="skin-image">スキンの画像:</label>
+                <label>スキンの画像:</label>
                 <input type="file" class="skin-image" required><br><br>
             </div>
         </div>
@@ -39,7 +39,6 @@
     <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
 
     <script>
-        // UUID生成関数
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -47,25 +46,23 @@
             });
         }
 
-        // アイテムのエントリを追加する関数
         document.getElementById('add-skin').addEventListener('click', function() {
             const skinContainer = document.createElement('div');
             skinContainer.className = 'skin-entry';
             skinContainer.innerHTML = `
-                <label for="skin-name">スキンの名前:</label>
+                <label>スキンの名前:</label>
                 <input type="text" class="skin-name" required><br><br>
 
-                <label for="skin-english-name">英語のスキンの名前:</label>
+                <label>英語のスキンの名前:</label>
                 <input type="text" class="skin-english-name" required><br><br>
 
-                <label for="skin-image">スキンの画像:</label>
+                <label>スキンの画像:</label>
                 <input type="file" class="skin-image" required><br><br>
 
                 <button type="button" class="remove-skin">削除</button><br><br>
             `;
             document.getElementById('skins-container').appendChild(skinContainer);
 
-            // 削除ボタンにイベントリスナーを追加
             skinContainer.querySelector('.remove-skin').addEventListener('click', function() {
                 skinContainer.remove();
             });
@@ -80,69 +77,69 @@
             const UUIDB = generateUUID();
 
             const zip = new JSZip();
+
+            // manifest.json
             zip.file("manifest.json", JSON.stringify({
-              "header": {
-                "name": "pack.name",
-                "version": [1, 0, 0],
-                "uuid": UUIDA
-              },
-              "modules": [
-                {
-                  "version": [1, 0, 0],
-                  "type": "skin_pack",
-                  "uuid": UUIDB
-                }
-              ],
-              "format_version": 1
+                "format_version": 1,
+                "header": {
+                    "name": "pack.name",
+                    "description": description,
+                    "version": [1, 0, 0],
+                    "uuid": UUIDA
+                },
+                "modules": [
+                    {
+                        "type": "skin_pack",
+                        "uuid": UUIDB,
+                        "version": [1, 0, 0]
+                    }
+                ]
             }, null, 2));
 
-            let en_US_lang = ["skinpack.TemplateSkinPack=" + englishName];
-            let ja_JP_lang = ["skinpack.TemplateSkinPack=" + name];
+            // スキン処理
             const skinEntries = document.querySelectorAll('.skin-entry');
             const skins = [];
+            let en_US_lang = ["skinpack.TemplateSkinPack=" + englishName];
+            let ja_JP_lang = ["skinpack.TemplateSkinPack=" + name];
+
             let number = 0;
             for (const entry of skinEntries) {
-                number = number + 1;
+                number++;
                 const skinName = entry.querySelector('.skin-name').value;
                 const skinEnglishName = entry.querySelector('.skin-english-name').value;
                 const skinImageFile = entry.querySelector('.skin-image').files[0];
 
                 zip.file(`${skinEnglishName}.png`, await skinImageFile.arrayBuffer());
-                skins.push(JSON.stringify({
-                      "localization_name": "TemplateSkin" + number,
-                      "geometry": "geometry.humanoid.customSlim",
-                      "texture": skinEnglishName + ".png",
-                      "type": "free"
-                    });
-                en_US_lang.push("skin.TemplateSkinPack.TemplateSkin1=" + skinEnglishName);
-                ja_JP_lang.push("skin.TemplateSkinPack.TemplateSkin1=" + skinName);
+
+                skins.push({
+                    "localization_name": "TemplateSkin" + number,
+                    "geometry": "geometry.humanoid.customSlim",
+                    "texture": skinEnglishName + ".png",
+                    "type": "free"
+                });
+
+                en_US_lang.push("skin.TemplateSkinPack.TemplateSkin" + number + "=" + skinEnglishName);
+                ja_JP_lang.push("skin.TemplateSkinPack.TemplateSkin" + number + "=" + skinName);
             }
+
+            // skins.json
             zip.file("skins.json", JSON.stringify({
                 "serialize_name": "TemplateSkinPack",
                 "localization_name": "TemplateSkinPack",
                 "skins": skins
-            });
+            }, null, 2));
 
-            let en_US_text = "";
-            for (const en_US in en_US_lang) {
-                en_US_text = en_US_text + /n + en_US
-            }
-            let ja_JP_text = "";
-            for (const ja_JP in ja_JP_lang) {
-                ja_JP_text = ja_JP_text + /n + ja_JP
-            }
-
+            // textsフォルダと言語ファイル
             const texts_folder = zip.folder("texts");
-            texts_folder.file("en_US.lang", en_US_text);
-            texts_folder.file("ja.JP.lang", ja_JP_text);
-            languages = ["en_US", "ja_JP"]
-            texts_folder.file("languages.json", languages);
+            texts_folder.file("en_US.lang", en_US_lang.join('\n'));
+            texts_folder.file("ja_JP.lang", ja_JP_lang.join('\n'));
+            const languages = ["en_US", "ja_JP"];
+            texts_folder.file("languages.json", JSON.stringify(languages, null, 2));
 
+            // ZIP → BLOB → ダウンロードリンク生成
             const skinpackBlob = await zip.generateAsync({ type: "blob" });
-
             const downloadLink = document.getElementById('download-link');
-
-            const mcpackUrl =  = URL.createObjectURL(skinpackBlob);
+            const mcpackUrl = URL.createObjectURL(skinpackBlob);
             downloadLink.href = mcpackUrl;
             downloadLink.download = `${englishName}.mcpack`;
             downloadLink.style.display = 'block';
@@ -153,3 +150,4 @@
         });
     </script>
 </body>
+</html>
