@@ -96,7 +96,8 @@
               "format_version": 1
             }, null, 2));
 
-            let en_US_lang = ["skinpack.TemplateSkinPack=" + englishName]
+            let en_US_lang = ["skinpack.TemplateSkinPack=" + englishName];
+            let ja_JP_lang = ["skinpack.TemplateSkinPack=" + name];
             const skinEntries = document.querySelectorAll('.skin-entry');
             const skins = [];
             let number = 0;
@@ -113,5 +114,40 @@
                       "texture": skinEnglishName + ".png",
                       "type": "free"
                     });
+                en_US_lang.push("skin.TemplateSkinPack.TemplateSkin1=" + skinEnglishName);
+                ja_JP_lang.push("skin.TemplateSkinPack.TemplateSkin1=" + skinName);
             }
+            zip.file("skins.json", JSON.stringify({
+                "serialize_name": "TemplateSkinPack",
+                "localization_name": "TemplateSkinPack",
+                "skins": skins
+            });
+
+            let en_US_text = "";
+            for (const en_US in en_US_lang) {
+                en_US_text = en_US_text + /n + en_US
+            }
+            let ja_JP_text = "";
+            for (const ja_JP in ja_JP_lang) {
+                ja_JP_text = ja_JP_text + /n + ja_JP
+            }
+
+            const texts_folder = zip.folder("texts");
+            texts_folder.file("en_US.lang", en_US_text);
+            texts_folder.file("ja.JP.lang", ja_JP_text);
+            languages = ["en_US", "ja_JP"]
+            texts_folder.file("languages.json", languages);
+
+            const skinpackBlob = await zip.generateAsync({ type: "blob" });
+
+            const downloadLink = document.getElementById('download-link');
+
+            const mcpackUrl =  = URL.createObjectURL(skinpackBlob);
+            downloadLink.href = mcpackUrl;
+            downloadLink.download = `${englishName}.mcpack`;
+            downloadLink.style.display = 'block';
+
+            downloadLink.addEventListener('click', function () {
+                setTimeout(() => URL.revokeObjectURL(mcpackUrl), 100);
+            });
         });
