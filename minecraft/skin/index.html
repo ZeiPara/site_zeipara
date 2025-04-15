@@ -78,4 +78,21 @@
 
             const UUIDA = generateUUID();
             const UUIDB = generateUUID();
+
+            const zip = new JSZip();
+            zip.file("manifest.json", JSON.stringify({
+  "header": {
+    "name": "pack.name",
+    "version": [1, 0, 0],
+    "uuid": UUIDA
+  },
+  "modules": [
+    {
+      "version": [1, 0, 0],
+      "type": "skin_pack",
+      "uuid": UUIDB
+    }
+  ],
+  "format_version": 1
+}, null, 2));
         });
