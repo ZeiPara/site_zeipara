@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイクラスキンパック生成</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <h1>マイクラスキンパック生成</h1>
+
+    <form id="data-form">
+        <label for="name">名前:</label>
+        <input type="text" id="name" required><br><br>
+
+        <label for="english-name">英語のパックの名前:</label>
+        <input type="text" id="english-name" required><br><br>
+
+        <label for="description">説明:</label>
+        <input type="text" id="description" required><br><br>
+
+        <div id="skins-container">
+            <div class="skin-entry">
+                <label for="skin-name">スキンの名前:</label>
+                <input type="text" class="skin-name" required><br><br>
+
+                <label for="skin-english-name">英語のスキンの名前:</label>
+                <input type="text" class="skin-english-name" required><br><br>
+
+                <label for="skin-image">スキンの画像:</label>
+                <input type="file" class="skin-image" required><br><br>
+            </div>
+        </div>
+        
+        <button type="button" id="add-skin">スキンを追加</button><br><br>
+        <button type="button" id="create-skinpack">スキンパック作成</button>
+    </form>
+
+    <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
+
+    <script>
+        // UUID生成関数
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // アイテムのエントリを追加する関数
+        document.getElementById('add-skin').addEventListener('click', function() {
+            const skinContainer = document.createElement('div');
+            skinContainer.className = 'skin-entry';
+            skinContainer.innerHTML = `
+                <label for="skin-name">スキンの名前:</label>
+                <input type="text" class="skin-name" required><br><br>
+
+                <label for="skin-english-name">英語のスキンの名前:</label>
+                <input type="text" class="skin-english-name" required><br><br>
+
+                <label for="skin-image">スキンの画像:</label>
+                <input type="file" class="skin-image" required><br><br>
+
+                <button type="button" class="remove-skin">削除</button><br><br>
+            `;
+            document.getElementById('skins-container').appendChild(skinContainer);
+
+            // 削除ボタンにイベントリスナーを追加
+            skinContainer.querySelector('.remove-skin').addEventListener('click', function() {
+                skinContainer.remove();
+            });
+        });
+
+      document.getElementById('create-mcaddon').addEventListener('click', async function () {
+        
+      });
