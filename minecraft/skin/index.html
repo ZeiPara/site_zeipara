@@ -81,18 +81,37 @@
 
             const zip = new JSZip();
             zip.file("manifest.json", JSON.stringify({
-  "header": {
-    "name": "pack.name",
-    "version": [1, 0, 0],
-    "uuid": UUIDA
-  },
-  "modules": [
-    {
-      "version": [1, 0, 0],
-      "type": "skin_pack",
-      "uuid": UUIDB
-    }
-  ],
-  "format_version": 1
-}, null, 2));
+              "header": {
+                "name": "pack.name",
+                "version": [1, 0, 0],
+                "uuid": UUIDA
+              },
+              "modules": [
+                {
+                  "version": [1, 0, 0],
+                  "type": "skin_pack",
+                  "uuid": UUIDB
+                }
+              ],
+              "format_version": 1
+            }, null, 2));
+
+            let en_US_lang = ["skinpack.TemplateSkinPack=" + englishName]
+            const skinEntries = document.querySelectorAll('.skin-entry');
+            const skins = [];
+            let number = 0;
+            for (const entry of skinEntries) {
+                number = number + 1;
+                const skinName = entry.querySelector('.skin-name').value;
+                const skinEnglishName = entry.querySelector('.skin-english-name').value;
+                const skinImageFile = entry.querySelector('.skin-image').files[0];
+
+                zip.file(`${skinEnglishName}.png`, await skinImageFile.arrayBuffer());
+                skins.push(JSON.stringify({
+                      "localization_name": "TemplateSkin" + number,
+                      "geometry": "geometry.humanoid.customSlim",
+                      "texture": skinEnglishName + ".png",
+                      "type": "free"
+                    });
+            }
         });
