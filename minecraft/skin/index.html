@@ -71,6 +71,11 @@
             });
         });
 
-      document.getElementById('create-mcaddon').addEventListener('click', async function () {
-        
-      });
+        document.getElementById('create-skinpack').addEventListener('click', async function () {
+            const name = document.getElementById('name').value;
+            const englishName = document.getElementById('english-name').value;
+            const description = document.getElementById('description').value;
+
+            const UUIDA = generateUUID();
+            const UUIDB = generateUUID();
+        });
