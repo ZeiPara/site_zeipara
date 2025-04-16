@@ -29,6 +29,12 @@
 
                 <label>スキンの画像:</label>
                 <input type="file" class="skin-image" required><br><br>
+
+                <label>スキンのタイプ:</label>
+                <select class="skin-type" required>
+                    <option value="geometry.humanoid.custom">スティーブモデル</option>
+                    <option value="geometry.humanoid.customSlim">アレックスモデル</option>
+                </select>  
             </div>
         </div>
         
@@ -108,12 +114,13 @@
                 const skinName = entry.querySelector('.skin-name').value;
                 const skinEnglishName = entry.querySelector('.skin-english-name').value;
                 const skinImageFile = entry.querySelector('.skin-image').files[0];
+                const skinType = entry.querySelector('.skin-type').value;
 
                 zip.file(`${skinEnglishName}.png`, await skinImageFile.arrayBuffer());
 
                 skins.push({
                     "localization_name": "TemplateSkin" + number,
-                    "geometry": "geometry.humanoid.customSlim",
+                    "geometry": skinType,
                     "texture": skinEnglishName + ".png",
                     "type": "free"
                 });
