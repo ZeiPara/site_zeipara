@@ -32,6 +32,15 @@
 
                 <label for="allow_off_hand">左手に持てるか:</label>
                 <input type="checkbox" class="allow_off_hand" value="True"><br><br>
+
+                <label for="bundle_interaction">バンドルに入れた時の容量(1〜64):</label>
+                <input type="number" class="bundle_interaction" min="1" max="64" value="1" required><br><br>
+
+                <label for="can_destroy_in_creative">左手に持てるか:</label>
+                <input type="checkbox" class="can_destroy_in_creative" value="True"><br><br>
+
+                <label for="damage">ダメージ:</label>
+                <input type="number" class="damage" min="1" value="1" required><br><br>
             </div>
         </div>
         
@@ -160,6 +169,17 @@
                 } else {
                     const allow_off_hand = false;
                 }
+                const bundle_interaction = entry.querySelector('.bundle_interaction').value;
+                if (bundle_interaction > 64) {
+                    alert("64より小さい値にしてください");
+                }
+                const can_destroy_in_creative = entry.querySelector('.can_destroy_in_creative').value;
+                if (entry.querySelector('.can_destroy_in_creative').value=="True") {
+                    const can_destroy_in_creative = true;
+                } else {
+                    const can_destroy_in_creative = false;
+                }
+                const damage = entry.querySelector('.damage').value;
 
                 texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
                 itemTexturesData[itemEnglishName] = {
@@ -180,9 +200,15 @@
                             "minecraft:icon": itemEnglishName,
                             "minecraft:display_name": {
                                 "value": itemName
-                            }
+                            },
                             "minecraft:allow_off_hand": {
                                 "value": allow_off_hand
+                            },
+                            "minecraft:bundle_interaction": {
+                                "num_viewable_slots": bundle_interaction
+                            },
+                            "minecraft:can_destroy_in_creative": {
+                                "value": can_destroy_in_creative
                             }
                         }
                     }
