@@ -29,6 +29,9 @@
 
                 <label for="item-image">アイテムの画像(サイズは16の倍数の正方形):</label>
                 <input type="file" class="item-image" required><br><br>
+
+                <label for="allow_off_hand">左手に持てるか:</label>
+                <input type="checkbox" class="allow_off_hand" value="True"><br><br>
             </div>
         </div>
         
@@ -60,6 +63,9 @@
 
                 <label for="item-image">アイテムの画像(サイズは16の倍数の正方形):</label>
                 <input type="file" class="item-image" required><br><br>
+
+                <label for="allow_off_hand">左手に持てるか:</label>
+                <input type="checkbox" class="allow_off_hand" value="True"><br><br>
 
                 <button type="button" class="remove-item">削除</button><br><br>
             `;
@@ -149,6 +155,11 @@
                 const itemName = entry.querySelector('.item-name').value;
                 const itemEnglishName = entry.querySelector('.item-english-name').value;
                 const itemImageFile = entry.querySelector('.item-image').files[0];
+                if (entry.querySelector('.allow_off_hand').value=="True") {
+                    const allow_off_hand = true;
+                } else {
+                    const allow_off_hand = false;
+                }
 
                 texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
                 itemTexturesData[itemEnglishName] = {
@@ -169,6 +180,9 @@
                             "minecraft:icon": itemEnglishName,
                             "minecraft:display_name": {
                                 "value": itemName
+                            }
+                            "minecraft:allow_off_hand": {
+                                "value": true
                             }
                         }
                     }
