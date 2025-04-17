@@ -238,7 +238,8 @@
             for (const entry of itemEntries) {
                 const itemName = entry.querySelector('.item-name').value;
                 const itemEnglishName = entry.querySelector('.item-english-name').value;
-                const itemImageFile = entry.querySelector('.item-image').files[0];
+                const beforeItemImageFile = entry.querySelector('.item-image').files[0];
+                const itemImageFile = await resizeImageTo16x16(beforeItemImageFile);
                 const allow_off_hand = entry.querySelector('.allow_off_hand').checked;
                 const bundle_interaction = parseInt(entry.querySelector('.bundle_interaction').value);
                 const can_destroy_in_creative = entry.querySelector('.can_destroy_in_creative').checked;
