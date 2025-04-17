@@ -31,30 +31,30 @@
                 <input type="file" class="item-image" required><br><br>
 
                 <label for="allow_off_hand">左手に持てるか:</label>
-                <input type="checkbox" class="allow_off_hand" value="True"><br><br>
+                <input type="checkbox" class="allow_off_hand"><br><br>
 
                 <label for="bundle_interaction">バンドルにした時の容量(1〜64):</label>
                 <input type="number" class="bundle_interaction" min="1" max="64" value="1" required><br><br>
 
                 <label for="can_destroy_in_creative">クリエイティブでブロックを叩いた時に壊せるか:</label>
-                <input type="checkbox" class="can_destroy_in_creative" value="True"><br><br>
+                <input type="checkbox" class="can_destroy_in_creative"><br><br>
 
                 <label for="damage">与えるダメージ:</label>
                 <input type="number" class="damage" min="1" value="1" required><br><br>
 
                 <label for="food">食べ物になるか:</label>
-                <input type="checkbox" class="food" value="True"><br><br>
+                <input type="checkbox" class="food"><br><br>
 
-                <div id="foods">
+                <div id="foods" style="display:none;">
                     <label for="can_always_eat">満腹でも食べられるか:</label>
-                    <input type="checkbox" class="can_always_eat" value="True"><br><br>
+                    <input type="checkbox" class="can_always_eat"><br><br>
 
-                    <label for="bundle_interaction">回復する満腹度(1~4294967295?):</label>
-                    <input type="number" class="bundle_interaction" min="1" max="4294967295" value="1"><br><br>
+                    <label for="nutrition">回復する満腹度(1~4294967295?):</label>
+                    <input type="number" class="nutrition" min="1" max="4294967295" value="1"><br><br>
                 </div>
             </div>
         </div>
-        
+
         <button type="button" id="add-item">アイテムを追加</button><br><br>
         <button type="button" id="create-mcaddon">MCAddon作成</button>
     </form>
@@ -63,25 +63,20 @@
 
     <script>
         window.addEventListener("load", (event) => {
-            while (true) {
-                const itemEntries = document.querySelectorAll('.item-entry');
-                for (const entry of itemEntries) {
-                    const food = entry.querySelector('.food').value;
-                    if (entry.querySelector('.food').value=="True") {
-                        const food = true;
-                    } else {
-                        const food = false;
-                    }
-                    const element_foods = document.getElementById('foods');
-                    if (food) {
-                        elements_foods.style.display = "block";
-                    } else {
-                        elements_foods.style.display = "none";
-                    }
+            const itemEntries = document.querySelectorAll('.item-entry');
+            for (const entry of itemEntries) {
+                const foodCheckbox = entry.querySelector('.food');
+                const foodsDiv = entry.querySelector('#foods');
+
+                function toggleFoodVisibility() {
+                    foodsDiv.style.display = foodCheckbox.checked ? "block" : "none";
                 }
+
+                foodCheckbox.addEventListener('change', toggleFoodVisibility);
+                toggleFoodVisibility(); // 初期表示を設定
             }
         });
-        
+
         // UUID生成関数
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -105,16 +100,27 @@
                 <input type="file" class="item-image" required><br><br>
 
                 <label for="allow_off_hand">左手に持てるか:</label>
-                <input type="checkbox" class="allow_off_hand" value="True"><br><br>
+                <input type="checkbox" class="allow_off_hand"><br><br>
 
                 <label for="bundle_interaction">バンドルにした時の容量(1〜64):</label>
                 <input type="number" class="bundle_interaction" min="1" max="64" value="1" required><br><br>
 
                 <label for="can_destroy_in_creative">クリエイティブでブロックを叩いた時に壊せるか:</label>
-                <input type="checkbox" class="can_destroy_in_creative" value="True"><br><br>
+                <input type="checkbox" class="can_destroy_in_creative"><br><br>
 
                 <label for="damage">与えるダメージ:</label>
                 <input type="number" class="damage" min="1" value="1" required><br><br>
+
+                <label for="food">食べ物になるか:</label>
+                <input type="checkbox" class="food"><br><br>
+
+                <div id="foods" style="display:none;">
+                    <label for="can_always_eat">満腹でも食べられるか:</label>
+                    <input type="checkbox" class="can_always_eat"><br><br>
+
+                    <label for="nutrition">回復する満腹度(1~4294967295?):</label>
+                    <input type="number" class="nutrition" min="1" max="4294967295" value="1"><br><br>
+                </div>
 
                 <button type="button" class="remove-item">削除</button><br><br>
             `;
@@ -124,6 +130,15 @@
             itemContainer.querySelector('.remove-item').addEventListener('click', function() {
                 itemContainer.remove();
             });
+
+            // 新しいアイテムエントリにもイベントリスナーを設定
+            const foodCheckbox = itemContainer.querySelector('.food');
+            const foodsDiv = itemContainer.querySelector('#foods');
+            function toggleNewFoodVisibility() {
+                foodsDiv.style.display = foodCheckbox.checked ? "block" : "none";
+            }
+            foodCheckbox.addEventListener('change', toggleNewFoodVisibility);
+            toggleNewFoodVisibility();
         });
 
         document.getElementById('create-mcaddon').addEventListener('click', async function () {
@@ -204,43 +219,65 @@
                 const itemName = entry.querySelector('.item-name').value;
                 const itemEnglishName = entry.querySelector('.item-english-name').value;
                 const itemImageFile = entry.querySelector('.item-image').files[0];
-                if (entry.querySelector('.allow_off_hand').value=="True") {
-                    const allow_off_hand = true;
-                } else {
-                    const allow_off_hand = false;
-                }
-                const bundle_interaction = entry.querySelector('.bundle_interaction').value;
+                const allow_off_hand = entry.querySelector('.allow_off_hand').checked;
+                const bundle_interaction = parseInt(entry.querySelector('.bundle_interaction').value);
+                const can_destroy_in_creative = entry.querySelector('.can_destroy_in_creative').checked;
+                const damage = parseInt(entry.querySelector('.damage').value);
+                const isFood = entry.querySelector('.food').checked;
+                let foodComponent = null;
+
                 if (bundle_interaction > 64) {
-                    alert("64より小さい値にしてください");
-                }
-                if (entry.querySelector('.can_destroy_in_creative').value=="True") {
-                    const can_destroy_in_creative = true;
-                } else {
-                    const can_destroy_in_creative = false;
-                }
-                const damage = entry.querySelector('.damage').value;
-                const food = entry.querySelector('.food').value;
-                if (entry.querySelector('.food').value=="True") {
-                    const food = true;
-                } else {
-                    const food = false;
-                }
-                if (food==true) {
-                    const can_always_eat = entry.querySelector('.can_always_eat').value;
-                    const nutrition = entry.querySelector('.nutrition').value;
-                    const foods = JSON.stringify(
-                        {
-                            "can_always_eat": can_always_eat,
-                            "nutrition": nutrition
-                        });
-                } else {
-                    const foods = null;
+                    alert("64より小さい値をバンドル容量にしてください");
+                    return;
                 }
 
-                texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
-                itemTexturesData[itemEnglishName] = {
-                    "textures": `textures/items/${itemEnglishName}`
+                if (itemImageFile) {
+                    texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
+                    itemTexturesData[itemEnglishName] = {
+                        "textures": `textures/items/${itemEnglishName}`
+                    };
+                } else {
+                    alert(`${itemName} (${itemEnglishName}) の画像が選択されていません。`);
+                    return;
+                }
+
+                if (isFood) {
+                    const can_always_eat = entry.querySelector('.can_always_eat').checked;
+                    const nutrition = parseInt(entry.querySelector('.nutrition').value);
+                    foodComponent = {
+                        "minecraft:food": {
+                            "can_always_eat": can_always_eat,
+                            "nutrition": nutrition
+                            // "saturation_modifier": 0.6 // 必要に応じて追加
+                            // "using_converts_to": "bowl" // 必要に応じて追加
+                        }
+                    };
+                }
+
+                const components = {
+                    "minecraft:max_stack_size": 64,
+                    "minecraft:icon": itemEnglishName,
+                    "minecraft:display_name": {
+                        "value": itemName
+                    },
+                    "minecraft:allow_off_hand": {
+                        "value": allow_off_hand
+                    },
+                    "minecraft:bundle_interaction": {
+                        "num_viewable_slots": bundle_interaction
+                    },
+                    "minecraft:can_destroy_in_creative": {
+                        "value": can_destroy_in_creative
+                    },
+                    "minecraft:damage": {
+                        "value": damage
+                    }
                 };
+
+                // 食べ物コンポーネントを追加
+                if (foodComponent) {
+                    Object.assign(components, foodComponent);
+                }
 
                 bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
                     "format_version": "1.21.10",
@@ -248,29 +285,10 @@
                         "description": {
                             "identifier": `${englishName}:${itemEnglishName}`,
                             "menu_category": {
-                                "category": "construction"
+                                "category": "construction" // 必要に応じて変更
                             }
                         },
-                        "components": {
-                            "minecraft:max_stack_size": 64,
-                            "minecraft:icon": itemEnglishName,
-                            "minecraft:display_name": {
-                                "value": itemName
-                            },
-                            "minecraft:allow_off_hand": {
-                                "value": allow_off_hand
-                            },
-                            "minecraft:bundle_interaction": {
-                                "num_viewable_slots": bundle_interaction
-                            },
-                            "minecraft:can_destroy_in_creative": {
-                                "value": can_destroy_in_creative
-                            },
-                            "minecraft:damage": {
-                                "value": damage
-                            }
-                            foods
-                        }
+                        "components": components
                     }
                 }, null, 2));
             }
@@ -299,10 +317,9 @@
 
             // ダウンロードリンクを設定
             const downloadLink = document.getElementById('download-link');
-            // BlobをオブジェクトURLとして作成
             const mcaddonUrl = URL.createObjectURL(mcaddonBlob);
             downloadLink.href = mcaddonUrl;
-            downloadLink.download = `${name}.mcaddon`; // ここで拡張子を.mcaddonに設定
+            downloadLink.download = `${name}.mcaddon`;
             downloadLink.style.display = 'block';
 
             // ダウンロード完了後、オブジェクトURLを解放
