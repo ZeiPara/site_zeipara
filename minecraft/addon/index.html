@@ -183,7 +183,11 @@
             const UUIDC = generateUUID();
             const UUIDD = generateUUID();
 
-            const min_engine_version = version.split(".");
+            const engine_version = version.split(".");
+            let min_engine_version = [];
+            for (const min in engine_version) {
+                min_engine_version.push(int(min));
+            }
 
             // RP ZIPファイルの生成
             const rpZip = new JSZip();
