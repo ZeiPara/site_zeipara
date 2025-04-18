@@ -10,6 +10,8 @@
     <h1>マイクラアドオン生成</h1>
 
     <form id="data-form">
+
+        
         <label for="name">名前:</label>
         <input type="text" id="name" required><br><br>
 
@@ -18,6 +20,13 @@
 
         <label for="description">説明:</label>
         <input type="text" id="description" required><br><br>
+
+        <label for="version">バージョン:</label>
+        <select name="version" id="version">
+            <option value="">--バージョンを選んでください--</option>
+            <option value="1.21.10">1.21.10</option>
+            <option value="1.21.00">1.21.00</option>
+        </select><br><br>
 
         <div id="items-container">
             <div class="item-entry">
@@ -166,6 +175,7 @@
             const name = document.getElementById('name').value;
             const englishName = document.getElementById('english-name').value;
             const description = document.getElementById('description').value;
+            const version = document.getElementById('version').value;
 
             // UUIDを生成
             const UUIDA = generateUUID();
@@ -301,7 +311,7 @@
                 }
 
                 bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
-                    "format_version": "1.21.10",
+                    "format_version": version,
                     "minecraft:item": {
                         "description": {
                             "identifier": `${englishName}:${itemEnglishName}`,
