@@ -185,9 +185,10 @@
 
             const engine_version = version.split(".");
             let min_engine_version = [];
-            for (const min in engine_version) {
-                min_engine_version.push(int(min));
+            for (const part of engine_version) {
+                min_engine_version.push(parseInt(part));
             }
+
 
             // RP ZIPファイルの生成
             const rpZip = new JSZip();
