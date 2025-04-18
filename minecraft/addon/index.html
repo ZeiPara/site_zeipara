@@ -183,6 +183,8 @@
             const UUIDC = generateUUID();
             const UUIDD = generateUUID();
 
+            const min_engine_version = version.split(".");
+
             // RP ZIPファイルの生成
             const rpZip = new JSZip();
             const rp = rpZip.folder("RP");
@@ -193,7 +195,7 @@
                     "name": name,
                     "uuid": UUIDA,
                     "version": [1, 0, 0],
-                    "min_engine_version": [1, 12, 0]
+                    "min_engine_version": min_engine_version
                 },
                 "modules": [
                     {
@@ -223,7 +225,7 @@
                     "name": name,
                     "uuid": UUIDC,
                     "version": [1, 0, 0],
-                    "min_engine_version": [1, 12, 0]
+                    "min_engine_version": min_engine_version
                 },
                 "modules": [
                     {
