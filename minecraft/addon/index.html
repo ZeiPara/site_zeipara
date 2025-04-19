@@ -195,7 +195,7 @@
             const rpZip = new JSZip();
             const rp = rpZip.folder("RP");
             rp.file("manifest.json", JSON.stringify({
-                "format_version": 1,
+                "format_version": 2,
                 "header": {
                     "description": description,
                     "name": name,
@@ -225,7 +225,7 @@
             const bpZip = new JSZip();
             const bp = bpZip.folder("BP");
             bp.file("manifest.json", JSON.stringify({
-                "format_version": 1,
+                "format_version": 2,
                 "header": {
                     "description": description,
                     "name": name,
