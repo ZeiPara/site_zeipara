@@ -42,9 +42,6 @@
                 <label for="allow_off_hand">左手に持てるか:</label>
                 <input type="checkbox" class="allow_off_hand"><br><br>
 
-                <label for="bundle_interaction">バンドルにした時の容量(1〜64):</label>
-                <input type="number" class="bundle_interaction" min="1" max="64" value="1" required><br><br>
-
                 <label for="can_destroy_in_creative">クリエイティブでブロックを叩いた時に壊せるか:</label>
                 <input type="checkbox" class="can_destroy_in_creative"><br><br>
 
@@ -130,9 +127,6 @@
 
                 <label for="allow_off_hand">左手に持てるか:</label>
                 <input type="checkbox" class="allow_off_hand"><br><br>
-
-                <label for="bundle_interaction">バンドルにした時の容量(1〜64):</label>
-                <input type="number" class="bundle_interaction" min="1" max="64" value="1" required><br><br>
 
                 <label for="can_destroy_in_creative">クリエイティブでブロックを叩いた時に壊せるか:</label>
                 <input type="checkbox" class="can_destroy_in_creative"><br><br>
@@ -259,7 +253,6 @@
                 const beforeItemImageFile = entry.querySelector('.item-image').files[0];
                 const itemImageFile = await resizeImageTo16x16(beforeItemImageFile);
                 const allow_off_hand = entry.querySelector('.allow_off_hand').checked;
-                const bundle_interaction = parseInt(entry.querySelector('.bundle_interaction').value);
                 const can_destroy_in_creative = entry.querySelector('.can_destroy_in_creative').checked;
                 const damage = parseInt(entry.querySelector('.damage').value);
                 const isFood = entry.querySelector('.food').checked;
@@ -301,9 +294,6 @@
                     },
                     "minecraft:allow_off_hand": {
                         "value": allow_off_hand
-                    },
-                    "minecraft:bundle_interaction": {
-                        "num_viewable_slots": bundle_interaction
                     },
                     "minecraft:can_destroy_in_creative": {
                         "value": can_destroy_in_creative
