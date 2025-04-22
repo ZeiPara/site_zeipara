@@ -58,6 +58,14 @@
                     <label for="nutrition">回復する満腹度(-2147483648~2147483647):</label>
                     <input type="number" class="nutrition" min="-2147483648" max="2147483647" value="1"><br><br>
                 </div>
+
+                <label for="food">燃料になるか:</label>
+                <input type="checkbox" class="fuel"><br><br>
+                
+                <div id="fuels" style="display:none;">
+                    <label for="duration">使える時間(0.05~107374180):</label>
+                    <input type="number" class="duration" min="0.05" max="107374180" value="1"><br><br>
+                </div>
             </div>
         </div>
 
@@ -93,13 +101,22 @@
             for (const entry of itemEntries) {
                 const foodCheckbox = entry.querySelector('.food');
                 const foodsDiv = entry.querySelector('#foods');
+                const fuelCheckbox = entry.querySelector('.fuel');
+                const fuelsDiv = entry.querySelector('#fuels');
 
                 function toggleFoodVisibility() {
                     foodsDiv.style.display = foodCheckbox.checked ? "block" : "none";
                 }
 
+                function toggleFuelVisibility() {
+                    fuelsDiv.style.display = fuelCheckbox.checked ? "block" : "none";
+                }
+
                 foodCheckbox.addEventListener('change', toggleFoodVisibility);
                 toggleFoodVisibility(); // 初期表示を設定
+
+                fuelCheckbox.addEventListener('change', toggleFuelVisibility);
+                toggleFuelVisibility(); // 初期表示を設定
             }
         });
 
@@ -145,6 +162,14 @@
                     <input type="number" class="nutrition" min="-2147483648" max="2147483647" value="1"><br><br>
                 </div>
 
+                <label for="food">燃料になるか:</label>
+                <input type="checkbox" class="fuel"><br><br>
+                
+                <div id="fuels" style="display:none;">
+                    <label for="duration">使える時間(0.05~107374180):</label>
+                    <input type="number" class="duration" min="0.05" max="107374180" value="1"><br><br>
+                </div>
+
                 <button type="button" class="remove-item">削除</button><br><br>
             `;
             document.getElementById('items-container').appendChild(itemContainer);
@@ -157,11 +182,18 @@
             // 新しいアイテムエントリにもイベントリスナーを設定
             const foodCheckbox = itemContainer.querySelector('.food');
             const foodsDiv = itemContainer.querySelector('#foods');
+            const fuelCheckbox = itemContainer.querySelector('.fuel');
+            const fuelsDiv = itemContainer.querySelector('#fuels');
             function toggleNewFoodVisibility() {
                 foodsDiv.style.display = foodCheckbox.checked ? "block" : "none";
             }
+            function toggleNewFuelVisibility() {
+                fuelsDiv.style.display = fuelCheckbox.checked ? "block" : "none";
+            }
             foodCheckbox.addEventListener('change', toggleNewFoodVisibility);
             toggleNewFoodVisibility();
+            fuelCheckbox.addEventListener('change', toggleNewFuelVisibility);
+            toggleNewFuelVisibility();
         });
 
         document.getElementById('create-mcaddon').addEventListener('click', async function () {
@@ -257,6 +289,8 @@
                 const damage = parseInt(entry.querySelector('.damage').value);
                 const isFood = entry.querySelector('.food').checked;
                 let foodComponent = null;
+                const isFuel = entry.querySelector('.fuel').checked;
+                let fuelComponent = null;
 
                 if (bundle_interaction > 64) {
                     alert("64より小さい値をバンドル容量にしてください");
@@ -285,6 +319,15 @@
                         }
                     };
                 }
+                
+                if (isFuel) {
+                    const duration = parseInt(entry.querySelector('.duration').value);
+                    fuelComponent = {
+                        "minecraft:fuel": {
+                            "duration": duration,
+                        }
+                    };
+                }
 
                 const components = {
                     "minecraft:max_stack_size": 64,
@@ -303,9 +346,12 @@
                     }
                 };
 
-                // 食べ物コンポーネントを追加
                 if (foodComponent) {
                     Object.assign(components, foodComponent);
+                }
+
+                if (fuelComponent) {
+                    Object.assign(components, fuelComponent);
                 }
 
                 bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
