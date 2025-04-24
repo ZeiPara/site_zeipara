@@ -17,6 +17,20 @@
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* 下に影をつける */
       }
 
+      .HeaderImage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        padding: 10px;
+        background-color: #31a9ee; /* ヘッダーの背景色 */
+        color: #000000; /* ヘッダー内の文字色 */
+        font-size: 20px; /* 文字サイズを調整 */
+        text-align: left; /* 中央揃え */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* 下に影をつける */
+      }
+
       /* コンテンツのスタイル */
       .Contents {
         margin-top: 80px; /* ヘッダーの高さ分だけ余白をつける */
@@ -26,8 +40,9 @@
     </style>
   </head>
   <body>
+    <div class="HeaderImage"><img src="https://zeipara.f5.si/ZeiParaIcon.png" width="5%"></div>
     <div class="Header">
-      <h3><img src="https://zeipara.f5.si/ZeiParaIcon.png" width="10%"><strong>ZeiParaのサイト</strong></h3>
+      <h3><strong>ZeiParaのサイト</strong></h3>
     </div>
     <div class="Contents">
       <h1>現在あるページ</h1>
