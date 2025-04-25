@@ -203,6 +203,9 @@
             const description = document.getElementById('description').value;
             const version = document.getElementById('version').value;
 
+            let includes = [name, englishName, description, version];
+            let includesName = ["パックの名前", "パックの英語の名前", "説明", "バージョン"];
+
             // UUIDを生成
             const UUIDA = generateUUID();
             const UUIDB = generateUUID();
@@ -279,7 +282,9 @@
             // 各アイテムの情報を処理
             const itemEntries = document.querySelectorAll('.item-entry');
             const itemTexturesData = {};
+            let number = 0;
             for (const entry of itemEntries) {
+                number += 1;
                 const itemName = entry.querySelector('.item-name').value;
                 const itemEnglishName = entry.querySelector('.item-english-name').value;
                 const beforeItemImageFile = entry.querySelector('.item-image').files[0];
@@ -292,19 +297,20 @@
                 const isFuel = entry.querySelector('.fuel').checked;
                 let fuelComponent = null;
 
-                if (itemImageFile) {
-                    texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
-                    itemTexturesData[itemEnglishName] = {
-                        "textures": `textures/items/${itemEnglishName}`
-                    };
+                if (beforeItemImageFile) {
+                    const imageNumber = 1;
                 } else {
-                    alert(`${itemName} (${itemEnglishName}) の画像が選択されていません。`);
-                    return;
+                    const imageNumber = "";
                 }
+
+                includes.push(itemName, itemEnglishName, imageNumber, damage);
+                let temporaryIncludesName = ["名前", "英語名", "画像", "ダメージ"];
 
                 if (isFood) {
                     const can_always_eat = entry.querySelector('.can_always_eat').checked;
                     const nutrition = parseInt(entry.querySelector('.nutrition').value);
+                    includes.push(nutrition);
+                    temporaryIncludesName.push("食べ物として回復する量");
                     foodComponent = {
                         "minecraft:food": {
                             "can_always_eat": can_always_eat,
@@ -317,6 +323,8 @@
                 
                 if (isFuel) {
                     const duration = parseInt(entry.querySelector('.duration').value);
+                    temporaryIncludesName.push("燃料として使える時間");
+                    includes.push(duration);
                     fuelComponent = {
                         "minecraft:fuel": {
                             "duration": duration,
@@ -324,43 +332,73 @@
                     };
                 }
 
-                const components = {
-                    "minecraft:max_stack_size": 64,
-                    "minecraft:icon": itemEnglishName,
-                    "minecraft:display_name": {
-                        "value": itemName
-                    },
-                    "minecraft:allow_off_hand": {
-                        "value": allow_off_hand
-                    },
-                    "minecraft:can_destroy_in_creative": {
-                        "value": can_destroy_in_creative
-                    },
-                    "minecraft:damage": {
-                        "value": damage
+                for (const include in temporaryIncludesName) {
+                    includesName.push("アイテム" + String(number) + include);
+                }
+
+                if (includes in "") {
+                    if (itemImageFile) {
+                        texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
+                        itemTexturesData[itemEnglishName] = {
+                            "textures": `textures/items/${itemEnglishName}`
+                        };
+                    } else {
+                        alert(`${itemName} (${itemEnglishName}) の画像が選択されていません。`);
+                        return;
                     }
-                };
 
-                if (foodComponent) {
-                    Object.assign(components, foodComponent);
-                }
-
-                if (fuelComponent) {
-                    Object.assign(components, fuelComponent);
-                }
-
-                bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
-                    "format_version": version,
-                    "minecraft:item": {
-                        "description": {
-                            "identifier": `${englishName}:${itemEnglishName}`,
-                            "menu_category": {
-                                "category": "construction" // 必要に応じて変更
-                            }
+                    const components = {
+                        "minecraft:max_stack_size": 64,
+                        "minecraft:icon": itemEnglishName,
+                        "minecraft:display_name": {
+                            "value": itemName
                         },
-                        "components": components
+                        "minecraft:allow_off_hand": {
+                            "value": allow_off_hand
+                        },
+                        "minecraft:can_destroy_in_creative": {
+                            "value": can_destroy_in_creative
+                        },
+                        "minecraft:damage": {
+                            "value": damage
+                        }
+                    };
+
+                    if (foodComponent) {
+                        Object.assign(components, foodComponent);
                     }
-                }, null, 2));
+
+                    if (fuelComponent) {
+                        Object.assign(components, fuelComponent);
+                    }
+
+                    bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
+                        "format_version": version,
+                        "minecraft:item": {
+                            "description": {
+                                "identifier": `${englishName}:${itemEnglishName}`,
+                                "menu_category": {
+                                    "category": "construction" // 必要に応じて変更
+                                }
+                            },
+                            "components": components
+                        }
+                    }, null, 2));
+                }
+            }
+
+            let num = 0;
+            airList = [];
+            for (i in includes) {
+                num += 1;
+                if (i==""){
+                    airList.push(includesName[num]);
+                }
+            }
+
+            if (airList.length>1) {
+                const joined = airList.join('、')
+                alert(joined + "を入力してください");
             }
 
             // アイテムテクスチャJSONファイルを追加
