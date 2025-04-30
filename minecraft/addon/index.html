@@ -75,6 +75,10 @@
 
     <a id="download-link" href="#" style="display:none;">ここをクリックしてダウンロード</a>
 
+    <div id="log">
+        <p>ログ:</p>
+    </div>
+
     <script>
       function resizeImageTo16x16(file) {
           return new Promise((resolve, reject) => {
@@ -94,6 +98,19 @@
             img.onerror = reject;
             img.src = URL.createObjectURL(file);
           });
+        }
+
+        function log(log) {
+            // id属性で要素を取得
+            let textbox_element = document.getElementById('log');
+
+            // 新しいHTML要素を作成
+            let new_element = document.createElement('p');
+            new_element.textContent = log;
+    
+            // 指定した要素の中の末尾に挿入
+            textbox_element.appendChild(new_element);
+
         }
         
         window.addEventListener("load", (event) => {
@@ -197,6 +214,7 @@
         });
 
         document.getElementById('create-mcaddon').addEventListener('click', async function () {
+            log("ボタンが押された");
             // 入力データを取得
             const name = document.getElementById('name').value;
             const englishName = document.getElementById('english-name').value;
