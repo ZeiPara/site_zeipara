@@ -368,8 +368,12 @@
 
                 log("8");
 
-                for (const include in temporaryIncludesName) {
-                    includesName.push("アイテム" + String(number) + include);
+                try {
+                    for (const include in temporaryIncludesName) {
+                        includesName.push("アイテム" + String(number) + include);
+                    }
+                } catch (e) {
+                    log("エラー:" + e);
                 }
 
                 log("9");
