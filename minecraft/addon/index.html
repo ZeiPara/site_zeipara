@@ -339,6 +339,7 @@
                 }
 
                 log("6");
+                log(String(temporaryIncludesName));
 
                 if (isFood) {
                     const can_always_eat = entry.querySelector('.can_always_eat').checked;
@@ -368,8 +369,10 @@
                 }
 
                 log("8");
+                log(String(temporaryIncludesName));
 
                 try {
+                    log(String(temporaryIncludesName));
                     for (const include in temporaryIncludesName) {
                         includesName.push("アイテム" + String(number) + include);
                     }
