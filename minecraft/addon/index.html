@@ -358,6 +358,8 @@
                     includesName.push("アイテム" + String(number) + include);
                 }
 
+                log("4");
+
                 if (includes in "") {
                     if (itemImageFile) {
                         texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
@@ -408,7 +410,6 @@
                     }, null, 2));
                 }
             }
-            log("4");
 
             let num = 0;
             airList = [];
