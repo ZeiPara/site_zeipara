@@ -325,6 +325,8 @@
                 } else {
                     const imageNumber = "";
                 }
+                
+                log("5");
 
                 includes.push(itemName, itemEnglishName, imageNumber, damage);
                 let temporaryIncludesName = ["名前", "英語名", "画像", "ダメージ"];
@@ -343,7 +345,7 @@
                         }
                     };
                 }
-                log("5");
+                log("6");
                 
                 if (isFuel) {
                     const duration = parseInt(entry.querySelector('.duration').value);
@@ -355,13 +357,10 @@
                         }
                     };
                 }
-                log("6");
 
                 for (const include in temporaryIncludesName) {
                     includesName.push("アイテム" + String(number) + include);
                 }
-                
-                log("7");
 
                 if (includes in "") {
                     if (itemImageFile) {
