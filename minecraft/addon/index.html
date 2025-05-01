@@ -237,6 +237,7 @@
                 min_engine_version.push(parseInt(part));
             }
 
+            log("1");
 
             // RP ZIPファイルの生成
             const rpZip = new JSZip();
@@ -267,6 +268,8 @@
             }, null, 2));
             const rpTextures = rp.folder("textures");
             const texturesItems = rpTextures.folder("items");
+
+            log("2");
 
             // BP ZIPファイルの生成
             const bpZip = new JSZip();
@@ -301,6 +304,7 @@
             const itemEntries = document.querySelectorAll('.item-entry');
             const itemTexturesData = {};
             let number = 0;
+            log("3");
             for (const entry of itemEntries) {
                 number += 1;
                 const itemName = entry.querySelector('.item-name').value;
@@ -404,6 +408,7 @@
                     }, null, 2));
                 }
             }
+            log("4");
 
             let num = 0;
             airList = [];
