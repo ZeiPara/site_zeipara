@@ -318,6 +318,7 @@
                 let foodComponent = null;
                 const isFuel = entry.querySelector('.fuel').checked;
                 let fuelComponent = null;
+                log("4");
 
                 if (beforeItemImageFile) {
                     const imageNumber = 1;
@@ -342,6 +343,7 @@
                         }
                     };
                 }
+                log("5");
                 
                 if (isFuel) {
                     const duration = parseInt(entry.querySelector('.duration').value);
@@ -353,12 +355,13 @@
                         }
                     };
                 }
+                log("6");
 
                 for (const include in temporaryIncludesName) {
                     includesName.push("アイテム" + String(number) + include);
                 }
-
-                log("4");
+                
+                log("7");
 
                 if (includes in "") {
                     if (itemImageFile) {
