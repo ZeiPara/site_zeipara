@@ -328,8 +328,12 @@
                 
                 log("5");
 
-                includes.push(itemName, itemEnglishName, imageNumber, damage);
-                let temporaryIncludesName = ["名前", "英語名", "画像", "ダメージ"];
+                try {
+                    includes.push(itemName, itemEnglishName, imageNumber, damage);
+                    let temporaryIncludesName = ["名前", "英語名", "画像", "ダメージ"];
+                } catch (e) {
+                    log("エラー" + e);
+                }
 
                 log("6");
 
