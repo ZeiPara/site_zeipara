@@ -331,6 +331,8 @@
                 includes.push(itemName, itemEnglishName, imageNumber, damage);
                 let temporaryIncludesName = ["名前", "英語名", "画像", "ダメージ"];
 
+                log("6");
+
                 if (isFood) {
                     const can_always_eat = entry.querySelector('.can_always_eat').checked;
                     const nutrition = parseInt(entry.querySelector('.nutrition').value);
@@ -345,7 +347,7 @@
                         }
                     };
                 }
-                log("6");
+                log("7");
                 
                 if (isFuel) {
                     const duration = parseInt(entry.querySelector('.duration').value);
@@ -357,6 +359,8 @@
                         }
                     };
                 }
+
+                log("8");
 
                 for (const include in temporaryIncludesName) {
                     includesName.push("アイテム" + String(number) + include);
