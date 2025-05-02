@@ -384,7 +384,7 @@
                 log("9");
 
                 try {
-                if (includes in "") {
+                if ("" in includes) {
                     log("10");
                     if (itemImageFile) {
                         texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
