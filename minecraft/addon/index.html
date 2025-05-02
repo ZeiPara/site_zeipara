@@ -442,13 +442,12 @@
             }
             
             let num = 0;
-            airList = [];
-            for (i in includes) {
-                num += 1;
-                if (includes[i]==""){
-                    airList.push(includesName[num]);
-                }
-            }
+            airList = [];
+            for (let i = 0; i < includes.length; i++) {
+                if (includes[i] === "") {
+                    airList.push(includesName[i]);
+                }
+            }
 
             if (airList.length>1) {
                 const joined = airList.join('、');
