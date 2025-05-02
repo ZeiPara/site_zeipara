@@ -384,6 +384,7 @@
                 log("9");
 
                 if (includes in "") {
+                    try {
                     if (itemImageFile) {
                         texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
                         itemTexturesData[itemEnglishName] = {
@@ -431,6 +432,9 @@
                             "components": components
                         }
                     }, null, 2));
+                    } catch (e) {
+                        log("エラー:" + e);
+                    }
                 }
             }
             
