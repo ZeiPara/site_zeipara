@@ -383,8 +383,9 @@
 
                 log("9");
 
+                try {
                 if (includes in "") {
-                    try {
+                    log("10");
                     if (itemImageFile) {
                         texturesItems.file(`${itemEnglishName}.png`, await itemImageFile.arrayBuffer());
                         itemTexturesData[itemEnglishName] = {
@@ -394,6 +395,7 @@
                         alert(`${itemName} (${itemEnglishName}) の画像が選択されていません。`);
                         return;
                     }
+                    log("11");
 
                     const components = {
                         "minecraft:max_stack_size": 64,
@@ -411,6 +413,7 @@
                             "value": damage
                         }
                     };
+                    log("12");
 
                     if (foodComponent) {
                         Object.assign(components, foodComponent);
@@ -432,14 +435,12 @@
                             "components": components
                         }
                     }, null, 2));
-                    } catch (e) {
-                        log("エラー:" + e);
-                    }
+                }
+                } catch (e) {
+                    log("エラー:" + e);
                 }
             }
             
-            log("10");
-
             let num = 0;
             airList = [];
             for (i in includes) {
