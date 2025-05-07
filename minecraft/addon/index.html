@@ -232,10 +232,10 @@
             const UUIDE = generateUUID();
 
             const engine_version = version.split(".");
-            let min_engine_version = [1, 12, 0];
-            //for (const part of engine_version) {
-            //    min_engine_version.push(parseInt(part));
-            //}
+            let min_engine_version = [];
+            for (const part of engine_version) {
+                min_engine_version.push(parseInt(part));
+            }
 
             log("1");
 
