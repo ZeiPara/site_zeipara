@@ -426,8 +426,23 @@
 
                     if (version=="1.21.00") {
                         const format_ver = "1.21.0";
+                        log("13");
                     }
+                    log("14");
                     bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
+                        "format_version": format_ver,
+                        "minecraft:item": {
+                            "description": {
+                                "identifier": `${englishName}:${itemEnglishName}`,
+                                "menu_category": {
+                                    "category": "construction" // 必要に応じて変更
+                                }
+                            },
+                            "components": components
+                        }
+                    }, null, 2));
+                    log("15");
+                    log(JSON.stringify({
                         "format_version": format_ver,
                         "minecraft:item": {
                             "description": {
