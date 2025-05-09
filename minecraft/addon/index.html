@@ -424,8 +424,11 @@
                         Object.assign(components, fuelComponent);
                     }
 
+                    if (version=="1.21.00") {
+                        const format_ver = "1.21.0";
+                    }
                     bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
-                        "format_version": version,
+                        "format_version": format_ver,
                         "minecraft:item": {
                             "description": {
                                 "identifier": `${englishName}:${itemEnglishName}`,
