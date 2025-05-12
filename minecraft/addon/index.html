@@ -424,11 +424,12 @@
                         Object.assign(components, fuelComponent);
                     }
 
+                    let format_ver;
                     if (version=="1.21.00") {
-                        const format_ver = "1.21.0";
+                        format_ver = "1.21.0";
                         log("13");
                     } else {
-                        const format_ver = version;
+                        format_ver = version;
                     }
                     log("14");
                     bpItems.file(`${itemEnglishName}.json`, JSON.stringify({
