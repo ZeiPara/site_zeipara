@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF2解析 (Pyodide版)</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <title>SF2解析 (JavaScript版)</title>
 </head>
 <body>
     <h1>SoundFont（.sf2）ファイル解析</h1>
@@ -13,16 +12,7 @@
     <pre id="output"></pre>
 
     <script>
-        let pyodideReady = loadPyodide(); // Pyodideの読み込みを開始
-
-        async function loadPyodide() {
-            window.pyodide = await loadPyodide();
-            console.log("Pyodide is ready!");
-        }
-
         async function readFile() {
-            await pyodideReady; // Pyodideの準備ができるまで待つ
-            
             const input = document.getElementById('fileInput');
             if (input.files.length === 0) {
                 alert("ファイルを選択してください。");
@@ -31,44 +21,44 @@
 
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = async function(event) {
-                let arrayBuffer = event.target.result;
-                let byteArray = new Uint8Array(arrayBuffer);
-                
-                // JavaScriptのバイト配列をPythonに渡す
-                await pyodide.runPythonAsync(`
-import sys
-from js import document
 
-def parse_sf2(file_bytes):
-    file_bytes = bytes(file_bytes)  # JavaScriptの配列をPythonのbytesに変換
-
-    if len(file_bytes) < 12:
-        document.getElementById("output").textContent = "ファイルが不正または小さすぎます。"
-        return
-    
-    riff_header = file_bytes[:4].decode("ascii")  # "RIFF"
-    file_size = int.from_bytes(file_bytes[4:8], "little")
-    file_type = file_bytes[8:12].decode("ascii")  # "sfbk"
-
-    output_text = f"Header: {riff_header}, File Size: {file_size}, File Type: {file_type}\\n"
-
-    offset = 12
-    while offset < len(file_bytes):
-        if offset + 8 > len(file_bytes):
-            break
-        chunk_id = file_bytes[offset:offset+4].decode("ascii")
-        chunk_size = int.from_bytes(file_bytes[offset+4:offset+8], "little")
-        output_text += f"Chunk ID: {chunk_id}, Size: {chunk_size}\\n"
-        offset += 8 + chunk_size
-
-    document.getElementById("output").textContent = output_text
-
-# JavaScriptから渡されたバイト配列を使って解析を実行
-parse_sf2(${JSON.stringify(Array.from(byteArray))})
-                `);
+            reader.onload = function(event) {
+                const arrayBuffer = event.target.result;
+                const byteArray = new Uint8Array(arrayBuffer);
+                parseSf2(byteArray);
             };
+
             reader.readAsArrayBuffer(file);
+        }
+
+        function parseSf2(fileBytes) {
+            const outputElement = document.getElementById("output");
+            let outputText = "";
+
+            if (fileBytes.length < 12) {
+                outputElement.textContent = "ファイルが不正または小さすぎます。";
+                return;
+            }
+
+            const riffHeader = String.fromCharCode.apply(null, fileBytes.slice(0, 4)); // "RIFF"
+            const fileSize = new DataView(fileBytes.slice(4, 8).buffer).getUint32(0, true);
+            const fileType = String.fromCharCode.apply(null, fileBytes.slice(8, 12)); // "sfbk"
+
+            outputText += `Header: ${riffHeader}, File Size: ${fileSize}, File Type: ${fileType}\n`;
+
+            let offset = 12;
+            while (offset < fileBytes.length) {
+                if (offset + 8 > fileBytes.length) {
+                    break;
+                }
+                const chunkIdBytes = fileBytes.slice(offset, offset + 4);
+                const chunkId = String.fromCharCode.apply(null, chunkIdBytes);
+                const chunkSize = new DataView(fileBytes.slice(offset + 4, offset + 8).buffer).getUint32(0, true);
+                outputText += `Chunk ID: ${chunkId}, Size: ${chunkSize}\n`;
+                offset += 8 + chunkSize;
+            }
+
+            outputElement.textContent = outputText;
         }
     </script>
 </body>
