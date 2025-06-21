@@ -5,7 +5,7 @@
   </head>
   <body>
     <script>
-      const content = document.getElementByClassName("content");
+      const content = document.querySelector("body");
       const currentSearchParams = new URLSearchParams(window.location.search);
       const currentPage = currentSearchParams.get("content");
       content.insertAdjacentHTML('afterbegin', currentPage);
