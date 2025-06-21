@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>text</title>
+    <title>HTML</title>
   </head>
   <body>
     <div class="content"></div>
     <script>
-      const content = document.querySelector("content");
+      const content = document.getElementByClassName("content");
       const currentSearchParams = new URLSearchParams(window.location.search);
       const currentPage = currentSearchParams.get("content");
       content.innerHTML = currentPage;
+      const title = document.querySelector("title");
+      title.textCeontent = content;
     </script>
   </body
 </html>
