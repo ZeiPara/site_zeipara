@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>text</title>
+  </head>
+  <body>
+    <div class="content"></div>
+    <script>
+      const content = document.querySelector("content");
+      const currentSearchParams = new URLSearchParams(window.location.search);
+      const currentPage = currentSearchParams.get("content");
+      content.innerHTML = currentPage;
+    </script>
+  </body
+</html>
