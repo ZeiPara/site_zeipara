@@ -4,12 +4,11 @@
     <title>HTML</title>
   </head>
   <body>
-    <div class="content"></div>
     <script>
       const content = document.getElementByClassName("content");
       const currentSearchParams = new URLSearchParams(window.location.search);
       const currentPage = currentSearchParams.get("content");
-      content.innerHTML = currentPage;
+      content.insertAdjacentHTML('afterbegin', currentPage);
       const title = document.querySelector("title");
       title.textCeontent = currentPage;
     </script>
