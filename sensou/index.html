@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Enter password...</title>
+  </head>
+  <body>
+    <input type=password id="password" />
+    <input type=submit id="button" />
+    <div class="log"></div>
+    <div class="comtent"></div>
+    <script>
+      function button() {
+        password = document.getElementById('password').value;
+        fetch("https://api.zeipara.f5.si/")
+          .then(response => {
+            if (!response.ok) {
+             throw new Error('Network response was not ok');
+            }
+           return response.json();
+          })
+          .then(data => {
+            if (data.success="success") {
+              const content = document.getElementByClassName('content');
+              content.innerHTML = data.content;
+            } else {
+              const log = document.getElementByClassName('log');
+              log.innerHTML = '<p>パスワードが違います</p>';
+            }
+          })
+          .catch(error => {
+            console.error('エラー:', error);
+          });
+      }
+
+      window.onload = function() {
+        document.getElementById('submit').addEventListener(submit, button);
+      }
+    </script>
+  </body>
+</html>
