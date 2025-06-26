@@ -7,10 +7,10 @@
     <input type=password id="password" />
     <input type=submit id="button" />
     <div class="log"></div>
-    <div class="comtent"></div>
+    <div class="content"></div>
     <script>
       function button() {
-        password = document.getElementById('password').value;
+        let password = document.getElementById('password').value;
         fetch(`https://api.zeipara.f5.si/password?password=${password}`)
           .then(response => {
             if (!response.ok) {
@@ -19,12 +19,12 @@
            return response.json();
           })
           .then(data => {
-            if (data.success="success") {
-              const content = document.getElementByClassName('content');
-              content.innerHTML = data.content;
+            if (data.success=="success") {
+              const content = document.getElementsByClassName('content');
+              content[0].innerHTML = data.content;
             } else {
-              const log = document.getElementByClassName('log');
-              log.innerHTML = '<p>パスワードが違います</p>';
+              const log = document.getElementsByClassName('log');
+              log[0].innerHTML = '<p>パスワードが違います</p>';
             }
           })
           .catch(error => {
@@ -33,7 +33,7 @@
       }
 
       window.onload = function() {
-        document.getElementById('submit').addEventListener(submit, button);
+        document.getElementById('submit').addEventListener(click, button);
       }
     </script>
   </body>
