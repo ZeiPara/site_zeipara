@@ -9,7 +9,7 @@
     <div class="log"></div>
     <div class="content"></div>
     <script>
-      function button() {
+      function checkPassword() {
         alert("wait...");
         let password = document.getElementById('password').value;
         fetch(`https://api.zeipara.f5.si/password?password=${password}`)
@@ -34,7 +34,7 @@
       }
 
       window.onload = function() {
-        document.getElementById('button').addEventListener(click, button);
+        document.getElementById('button').addEventListener('click', checkPassword);
       }
     </script>
   </body>
