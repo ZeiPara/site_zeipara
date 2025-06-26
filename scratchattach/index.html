@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>scratchattach</title>
+    <title>Enter password</title>
   </head>
   <body>
+    <div class="content">
     <textarea name="code" id="code"></textarea>
     <input type=submit id="submit" />
-    <div class="content"></div>
+    <div class="error"></div>
+    </div>
     <script>
       function submit() {
         event.preventDefault();
@@ -19,8 +21,9 @@
           const result = data;
           if (result.result == "OK") {
             document.getElementsByClassName('content')[0].innerHTML = result.HTML;
+            document.querySelector('title').innertext = result.title;
           } else {
-            document.getElementsByClassName('content')[0].innerHTML = "<p>パスワードが違います</p>";
+            document.getElementsByClassName('error')[0].innerHTML = "<p>パスワードが違います</p>";
           }
         });
       }
