@@ -9,6 +9,7 @@
     <div class="content"></div>
     <script>
       function submit() {
+        event.preventDefault();
         const code = document.getElementById('code').value;
         fetch(`https://api.zeipara.f5.si/script?code=${code}`)
         .then(response => {
@@ -19,8 +20,8 @@
           if (result.result == "OK") {
             document.getElementsByClassName('content')[0].innerHTML = result.HTML;
           } else {
-            
-          }document.getElementsByClassName('content')[0].innerHTML = "<p>パスワードが違います</p>";
+            document.getElementsByClassName('content')[0].innerHTML = "<p>パスワードが違います</p>";
+          }
         });
       }
       
