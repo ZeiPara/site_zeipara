@@ -17,10 +17,10 @@
         .then(data => {
           const result = data;
           if (result.result == "OK") {
-            document.getElementByClassName('content').innerHTML = result.HTML;
+            document.getElementsByClassName('content').innerHTML = result.HTML;
           } else {
             
-          }document.getElementByClassName('content').innerHTML = "<p>パスワードが違います</p>";
+          }document.getElementsByClassName('content').innerHTML = "<p>パスワードが違います</p>";
         });
       }
       
