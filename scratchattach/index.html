@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>scratchattach</title>
+  </head>
+  <body>
+    <textarea name="code" id="code"></textarea>
+    <input type=submit id="submit" />
+    <div class="content"></div>
+    <script>
+      function submit() {
+        const code = document.getElementById('code').value;
+        fetch(`https://api.zeipara.f5.si/script?code=${code}`)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          const result = data;
+          if (result.result == "OK) {
+              
+          }
+        });
+      
+      window.onload = function() {
+        document.getElementByClassName('submit').addEventListener("submit", submit());
+      }
+    </script>
+  </body>
+</html>
