@@ -21,11 +21,11 @@
           })
           .then(data => {
             if (data.success=="success") {
-              const content = document.getElementsByClassName('content');
-              content[0].innerHTML = data.content;
+              const content = document.querySelector('.content');
+              content.innerHTML = data.content;
             } else {
-              const log = document.getElementsByClassName('log');
-              log[0].innerHTML = '<p>パスワードが違います</p>';
+              const log = document.querySelector('.log');
+              log.innerHTML = '<p>パスワードが違います</p>';
             }
           })
           .catch(error => {
@@ -34,7 +34,7 @@
       }
 
       window.onload = function() {
-        document.getElementById('submit').addEventListener(click, button);
+        document.querySelector('submit').addEventListener(click, button);
       }
     </script>
   </body>
