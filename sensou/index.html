@@ -11,7 +11,7 @@
     <script>
       function button() {
         password = document.getElementById('password').value;
-        fetch("https://api.zeipara.f5.si/")
+        fetch(`https://api.zeipara.f5.si/password?password=${password}`)
           .then(response => {
             if (!response.ok) {
              throw new Error('Network response was not ok');
