@@ -17,9 +17,10 @@
         .then(data => {
           const result = data;
           if (result.result == "OK) {
-              
+            document.getElementByClassName('content').innerHTML = result.HTML;
           }
         });
+      }
       
       window.onload = function() {
         document.getElementByClassName('submit').addEventListener("submit", submit());
