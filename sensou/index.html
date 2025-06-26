@@ -20,7 +20,7 @@
            return response.json();
           })
           .then(data => {
-            if (data.success=="success") {
+            if (data.result=="OK") {
               const content = document.querySelector('.content');
               content.innerHTML = data.content;
             } else {
