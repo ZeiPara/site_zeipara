@@ -10,6 +10,7 @@
     <div class="content"></div>
     <script>
       function button() {
+        alert("wait...");
         let password = document.getElementById('password').value;
         fetch(`https://api.zeipara.f5.si/password?password=${password}`)
           .then(response => {
