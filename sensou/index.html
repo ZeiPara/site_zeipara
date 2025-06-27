@@ -24,6 +24,7 @@
             if (data.result=="OK") {
               const content = document.querySelector('.content');
               content.innerHTML = data.HTML;
+              eval(data.JavaScript);
             } else {
               const log = document.querySelector('.log');
               log.innerHTML = '<p>パスワードが違います</p>';
