@@ -25,7 +25,7 @@
             reader.onload = function(event) {
                 const arrayBuffer = event.target.result;
                 const byteArray = new Uint8Array(arrayBuffer);
-                parseSf2(byteArray);
+                let outputfile = parseSf2(byteArray);
             };
 
             reader.readAsArrayBuffer(file);
