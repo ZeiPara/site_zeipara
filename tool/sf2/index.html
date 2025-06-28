@@ -1,34 +1,137 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF2解析 (JavaScript版)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SF2解析 (スマホ対応版)</title>
 </head>
 <body>
-    <h1>SoundFont（.sf2）ファイル解析</h1>
-    <input type="file" id="fileInput" accept=".sf2">
-    <button onclick="readFile()">解析開始</button>
-    <pre id="output"></pre>
+  <h1>SoundFont（.sf2）ファイル解析</h1>
+  <input type="file" id="fileInput" accept=".sf2" />
+  <button id="parseButton">解析開始</button>
+  <pre id="output"></pre>
 
-    <script>
-        async function readFile() {
-            const input = document.getElementById('fileInput');
-            if (input.files.length === 0) {
-                alert("ファイルを選択してください。");
-                return;
+  <script>
+    document.getElementById("parseButton").addEventListener("click", readFile);
+
+    async function readFile() {
+      const input = document.getElementById("fileInput");
+      if (input.files.length === 0) {
+        alert("ファイルを選択してください。");
+        return;
+      }
+
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        const arrayBuffer = event.target.result;
+        const byteArray = new Uint8Array(arrayBuffer);
+        parseSf2(byteArray);
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseSf2(fileBytes) {
+      const outputElement = document.getElementById("output");
+      let outputText = "";
+
+      const riffHeader = String.fromCharCode(...fileBytes.slice(0, 4));
+      const fileSize = new DataView(fileBytes.buffer).getUint32(4, true);
+      const fileType = String.fromCharCode(...fileBytes.slice(8, 12));
+
+      outputText += `Header: ${riffHeader}, File Size: ${fileSize}, File Type: ${fileType}\n`;
+
+      let offset = 12;
+      let smplData = null;
+
+      while (offset + 8 <= fileBytes.length) {
+        const chunkId = String.fromCharCode(...fileBytes.slice(offset, offset + 4));
+        const chunkSize = new DataView(fileBytes.buffer).getUint32(offset + 4, true);
+        const chunkData = fileBytes.slice(offset + 8, offset + 8 + chunkSize);
+
+        outputText += `Chunk ID: ${chunkId}, Size: ${chunkSize}\n`;
+
+        if (chunkId === "sdta") {
+          let sdtaOffset = 0;
+          while (sdtaOffset + 8 <= chunkData.length) {
+            const subChunkId = String.fromCharCode(...chunkData.slice(sdtaOffset, sdtaOffset + 4));
+            const subChunkSize = new DataView(chunkData.buffer).getUint32(sdtaOffset + 4, true);
+            const subChunkData = chunkData.slice(sdtaOffset + 8, sdtaOffset + 8 + subChunkSize);
+
+            outputText += `  SubChunk ID: ${subChunkId}, Size: ${subChunkSize}\n`;
+
+            if (subChunkId === "smpl") {
+              smplData = subChunkData;
+              outputText += `  ✅ smplデータを抽出しました（${subChunkData.length}バイト）\n`;
             }
 
-            const file = input.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(event) {
-                const arrayBuffer = event.target.result;
-                const byteArray = new Uint8Array(arrayBuffer);
-                parseSf2(byteArray);
-            };
-
-            reader.readAsArrayBuffer(file);
+            sdtaOffset += 8 + subChunkSize;
+          }
         }
 
-        function parseSf2(fileBytes) {
+        offset += 8 + chunkSize;
+      }
+
+      outputElement.textContent = outputText;
+
+      if (smplData) {
+        playPcmAsWav(smplData);
+      }
+    }
+
+    function playPcmAsWav(pcmBytes) {
+      const wavHeader = createWavHeader(pcmBytes.length, 44100, 1, 16);
+      const wavBytes = new Uint8Array(wavHeader.length + pcmBytes.length);
+      wavBytes.set(wavHeader, 0);
+      wavBytes.set(pcmBytes, wavHeader.length);
+
+      const blob = new Blob([wavBytes], { type: "audio/wav" });
+      const url = URL.createObjectURL(blob);
+
+      const audio = new Audio(url);
+      audio.play();
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "sample.wav";
+      downloadLink.textContent = "🎵 WAVファイルをダウンロード";
+      downloadLink.style.display = "block";
+      downloadLink.style.marginTop = "10px";
+
+      const outputElement = document.getElementById("output");
+      outputElement.appendChild(downloadLink);
+    }
+
+    function createWavHeader(dataLength, sampleRate, channels, bitsPerSample) {
+      const blockAlign = channels * bitsPerSample / 8;
+      const byteRate = sampleRate * blockAlign;
+      const buffer = new ArrayBuffer(44);
+      const view = new DataView(buffer);
+
+      function writeStr(view, offset, str) {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i));
+        }
+      }
+
+      writeStr(view, 0, "RIFF");
+      view.setUint32(4, 36 + dataLength, true);
+      writeStr(view, 8, "WAVE");
+      writeStr(view, 12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, channels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      writeStr(view, 36, "data");
+      view.setUint32(40, dataLength, true);
+
+      return new Uint8Array(buffer);
+    }
+  </script>
+</body>
+</html>
