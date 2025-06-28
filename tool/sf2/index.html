@@ -53,22 +53,27 @@
 
         outputText += `Chunk ID: ${chunkId}, Size: ${chunkSize}\n`;
 
-        if (chunkId === "sdta") {
-          let sdtaOffset = 0;
-          while (sdtaOffset + 8 <= chunkData.length) {
-            const subChunkId = String.fromCharCode(...chunkData.slice(sdtaOffset, sdtaOffset + 4));
-            const subChunkSize = new DataView(chunkData.buffer).getUint32(sdtaOffset + 4, true);
-            const subChunkData = chunkData.slice(sdtaOffset + 8, sdtaOffset + 8 + subChunkSize);
+        const listType = String.fromCharCode(...chunkData.slice(0, 4));
+outputText += `  LIST Type: ${listType}\n`;
 
-            outputText += `  SubChunk ID: ${subChunkId}, Size: ${subChunkSize}\n`;
+if (listType === "sdta") {
+    let sdtaOffset = 4;
+    while (sdtaOffset + 8 <= chunkData.length) {
+        const subChunkId = String.fromCharCode(...chunkData.slice(sdtaOffset, sdtaOffset + 4));
+        const subChunkSize = new DataView(chunkData.buffer).getUint32(sdtaOffset + 4, true);
+        const subChunkData = chunkData.slice(sdtaOffset + 8, sdtaOffset + 8 + subChunkSize);
 
-            if (subChunkId === "smpl") {
-              smplData = subChunkData;
-              outputText += `  ✅ smplデータを抽出しました（${subChunkData.length}バイト）\n`;
-            }
+        outputText += `    SubChunk ID: ${subChunkId}, Size: ${subChunkSize}\n`;
 
-            sdtaOffset += 8 + subChunkSize;
-          }
+        if (subChunkId === "smpl") {
+            smplData = subChunkData;
+            outputText += `    ✅ smplデータを抽出しました（${subChunkData.length}バイト）\n`;
+        }
+
+        sdtaOffset += 8 + subChunkSize;
+    }
+}
+
         }
 
         offset += 8 + chunkSize;
