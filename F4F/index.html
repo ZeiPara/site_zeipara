@@ -10,6 +10,10 @@
       <input type=submit id="submit" value="送信" />
     </div>
     <script>
+      function submit2() {
+        
+      }
+      
       function submit() {
         fetch("https://api.zeipara.f5.si/F4F/login/")
         .then(response => {
@@ -21,17 +25,21 @@
           } else {
             alert("ログインに成功しました");
             const page = data.page;
+            let page_html = "";
             for i in range(page) {
-
-
+              page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"page${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(i+1)}ページ</label>`;
             }
-            document.querySelector('.content').innerHTML = ;
-            
+            page_html = page_html + '<input type=submit id=submit2 />';
+            document.querySelector('.content').innerHTML = page_html;
+            document.getElementById('submit2').addEventListener('click', submit2);
           }
         });
       }
       
-      document.getElementById('submit').addEventListener("click", submit);
+      
+      window.onload = function() {
+        document.getElementById('submit').addEventListener("click", submit);
+      }
     </script>
   </body>
 </html>
