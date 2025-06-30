@@ -15,7 +15,9 @@
       }
       
       function submit() {
-        fetch("https://api.zeipara.f5.si/F4F/login/")
+        username = document.getElementById('username').value;
+        password = document.getElementById('password').value;
+        fetch(`https://api.zeipara.f5.si/F4F/login/?username=${username}&password=${password}`)
         .then(response => {
           return response.json();
         })
@@ -35,11 +37,10 @@
           }
         });
       }
-      
-      
-      window.onload = function() {
-        document.getElementById('submit').addEventListener("click", submit);
-      }
+        
+      let password;
+      let username;
+      document.getElementById('submit').addEventListener("click", submit)
     </script>
   </body>
 </html>
