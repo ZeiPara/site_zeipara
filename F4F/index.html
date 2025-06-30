@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>F4F tool</title>
+  </head>
+  <body>
+    <div class="content">
+      <label for="username">ユーザー:</label><input type=text id="username" />
+      <label for="password">パスワード:</label><input type=password id="passeord" />
+      <input type=submit id="submit" value="送信" />
+    </div>
+    <script>
+      function submit() {
+        fetch("https://api.zeipara.f5.si/F4F/login/")
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          if (data.loginsuccess == false) {
+            alert("ログインに失敗しました");
+          } else {
+            alert("ログインに成功しました");
+            const page = data.page;
+            for i in range(page) {
+
+
+            }
+            document.querySelector('.content').innerHTML = ;
+            
+          }
+        });
+      }
+      
+      document.getElementById('submit').addEventListener("click", submit);
+    </script>
+  </body>
+</html>
