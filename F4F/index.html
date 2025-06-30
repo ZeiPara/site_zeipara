@@ -11,7 +11,11 @@
     </div>
     <script>
       function submit2() {
-        
+        const form = document.querySelector('form');
+        const data = new FormData(form);
+        for (const entry of data) {
+          const selented = entry;
+        }
       }
       
       function submit() {
@@ -27,11 +31,12 @@
           } else {
             alert("ログインに成功しました");
             const page = data.page;
-            let page_html = "";
-            for i in range(page) {
-              page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"page${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(i+1)}ページ</label>`;
+            let page_html = "<form>";
+            for (const i in [...Array(page).keys()]) {
+              if (i=
+              page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(i+1)}ページ</label>`;
             }
-            page_html = page_html + '<input type=submit id=submit2 />';
+            page_html = page_html + '<input type=submit id=submit2 /></form>';
             document.querySelector('.content').innerHTML = page_html;
             document.getElementById('submit2').addEventListener('click', submit2);
           }
