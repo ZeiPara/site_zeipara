@@ -6,15 +6,15 @@
   <body>
     <div class="content">
       <label for="username">ユーザー:</label><input type=text id="username" />
-      <label for="password">パスワード:</label><input type=password id="passeord" />
-      <input type=submit id="submit" value="送信" />
+      <label for="password">パスワード:</label><input type=password id="password" />
+      <input type="button" id="submit" value="送信" />
     </div>
     <script>
       function submit2() {
         const form = document.querySelector('form');
         const data = new FormData(form);
         for (const entry of data) {
-          const selected = int(entry[1]);
+          const selected = parseint(entry[1]);
         }
         fetch(`https://api.zeipara.f5.si/F4F?page=${selected}&username=${username}&password=${password}`)
         .then(response => {
@@ -40,10 +40,9 @@
             const page = data.page;
             let page_html = "<form>";
             for (const i in [...Array(page).keys()]) {
-              if (i=
               page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(i+1)}ページ</label>`;
             }
-            page_html = page_html + '<input type=submit id=submit2 /></form>';
+            page_html = page_html + '<input type=/"button/" id=/"submit2/" /></form>';
             document.querySelector('.content').innerHTML = page_html;
             document.getElementById('submit2').addEventListener('click', submit2);
           }
@@ -52,7 +51,7 @@
         
       let password;
       let username;
-      document.getElementById('submit').addEventListener("click", submit)
+      document.getElementById('submit').addEventListener("click", submit);
     </script>
   </body>
 </html>
