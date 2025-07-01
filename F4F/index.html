@@ -40,7 +40,7 @@
             const page = data.page;
             let page_html = "<form>";
             for (const i in [...Array(page).keys()]) {
-              page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(str(i)+1)}ページ</label>`;
+              page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i+1)}\" value=\"${String(i+1)}\" /><label for=\"page${String(i+1)}\">${String(parseInt(i)+1)}ページ</label>`;
             }
             page_html = page_html + '<input type=/"button/" id=/"submit2/" /></form>';
             document.querySelector('.content').innerHTML = page_html;
