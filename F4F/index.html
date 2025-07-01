@@ -14,8 +14,15 @@
         const form = document.querySelector('form');
         const data = new FormData(form);
         for (const entry of data) {
-          const selented = entry;
+          const selected = int(entry[1]);
         }
+        fetch(`https://api.zeipara.f5.si/F4F?page=${selected}`)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          alert(data.result);
+        });
       }
       
       function submit() {
