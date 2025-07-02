@@ -19,7 +19,7 @@
         const username = username_input.value;
         fetch(`https://api.zeipara.f5.si/user/date?username=${username}`)
         .then(response => {
-          return response.json;
+          return response.json();
         })
         .then(data => {
           if (data.success) {
