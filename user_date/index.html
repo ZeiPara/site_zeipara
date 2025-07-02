@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>user date</title>
+    <style>
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="text" id="username" /><br>
+    <input type="button" id="button" /><br>
+    <div class="content"></div>
+    <div class="error"></div>
+    <script>
+      function getuserdate() {
+        const username_input = document.getElementById('username');
+        const username = username_input.value;
+        fetch(`https://api.zeipara.f5.si/user/date?username=${username}`)
+        .then(response => {
+          return response.json;
+        })
+        .then(data => {
+          if (data.success) {
+            const content = document.querySelector('.content');
+            content.innerHTML = `<p>${data.result}</p>`;
+          } else {
+            const error = document.querySelector('.error');
+            error.innerHTML = `<p>${data.result}</p>`;
+          }
+        });
+      }
+
+      document.getElementById('button').addEventListenr('click', getuserdate);
+    </script>
+  </body>
+</html>
