@@ -14,7 +14,7 @@
         const form = document.querySelector('form');
         const data = new FormData(form);
         for (const entry of data) {
-          const selected = parseInt(entry[1]);
+          selected = parseInt(entry[1]);
         }
         fetch(`https://api.zeipara.f5.si/F4F?page=${selected}&username=${username}&password=${password}`)
         .then(response => {
@@ -51,6 +51,7 @@
         
       let password;
       let username;
+      let selected;
       document.getElementById('submit').addEventListener("click", submit);
     </script>
   </body>
