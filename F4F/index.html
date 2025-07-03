@@ -41,7 +41,7 @@
             let page_html = "<form>";
             for (const i in [...Array(page).keys()]) {
               let i_3 = ((parseInt(i) + 1) - ((parseInt(i) + 1) % 3)) / 3 + 1;
-              let i_p = (parseInt(i) + 1) % 3 - 1;
+              let i_p = (parseInt(i)) % 3 + 1;
               if (i_p == 0) {
                 page_html = page_html + `\n<input type=radio name=\"page\" id=\"page${String(i)}\" value=\"${String(i)}\" /><label for=\"page${String(i)}\">${String(i_3)}ページ</label><br>`;
               } else {
