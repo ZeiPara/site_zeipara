@@ -16,6 +16,7 @@
         for (const entry of data) {
           selected = String(entry[1]);
         }
+        alert(selected + "," + username + "," + password);
         fetch(`https://api.zeipara.f5.si/F4F?page=${selected}&username=${username}&password=${password}`)
         .then(response => {
           return response.json();
