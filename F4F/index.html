@@ -10,14 +10,22 @@
       <input type="button" id="submit" value="送信" />
     </div>
     <script>
+      function generateUUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+              const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+          });
+      }
+      
       function submit2() {
         const form = document.querySelector('form');
         const data = new FormData(form);
         for (const entry of data) {
           selected = String(entry[1]);
         }
+        const UUID = generateUUID();
         alert(selected + "," + username + "," + password);
-        fetch(`https://api.zeipara.f5.si/F4F?page=${selected}&username=${username}&password=${password}`)
+        fetch(`https://api.zeipara.f5.si/F4F?page=${selected}&username=${username}&password=${password}&UUID=${UUID}`)
         .then(response => {
           return response.json();
         })
