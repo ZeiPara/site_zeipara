@@ -22,7 +22,7 @@ videoUpload.addEventListener('change', (event) => {
     if (file) {
         const videoURL = URL.createObjectURL(file);
         video.src = videoURL;
-        video.load(); // 動画を読み込む
+        video.load();
     }
 });
 
@@ -36,13 +36,29 @@ imageUpload.addEventListener('change', (event) => {
 });
 
 
-// ... この下のコードは前回のものと同じだよ ...
-
-// Canvasのサイズを動画に合わせる
+// !!!---ここから新しい処理を追加---!!!
 video.addEventListener('loadedmetadata', () => {
+    // 動画のサイズに合わせてCanvasのサイズを調整
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+
+    // スライダーの最大値を動画のサイズに合わせる
+    xSlider.max = video.videoWidth;
+    ySlider.max = video.videoHeight;
+    // 画像が動画に収まる最大の大きさを計算
+    sizeSlider.max = Math.min(video.videoWidth, video.videoHeight);
+
+    // 初期値をリセット
+    xSlider.value = 0;
+    ySlider.value = 0;
+    sizeSlider.value = 50; // 例として初期値も調整
+    
+    // スライダーの表示値を更新
+    updateOverlayStyle();
 });
+
+// !!!---ここまで新しい処理を追加---!!!
+
 
 function drawFrame() {
     // Canvasをクリア
@@ -68,6 +84,24 @@ function drawFrame() {
     }
 }
 
+// プレビュー用の関数。CSSで画像を直接動かすため
+function updateOverlayStyle() {
+    const x = xSlider.value;
+    const y = ySlider.value;
+    const size = sizeSlider.value;
+    const rotate = rotateSlider.value;
+
+    // overlayImgが存在するか確認
+    if (overlayImg.src) {
+        overlayImg.style.display = 'block';
+        overlayImg.style.left = `${x}px`;
+        overlayImg.style.top = `${y}px`;
+        overlayImg.style.width = `${size}px`;
+        overlayImg.style.transform = `rotate(${rotate}deg)`;
+    }
+}
+
+// フォームの送信（ダウンロードボタンクリック）時の処理
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -107,6 +141,7 @@ form.addEventListener('submit', (e) => {
     mediaRecorder.start();
 });
 
+// 動画の再生ごとに描画を更新
 video.addEventListener('play', () => {
     const drawInterval = setInterval(() => {
         drawFrame();
@@ -117,17 +152,22 @@ video.addEventListener('play', () => {
 });
 
 video.addEventListener('timeupdate', () => {
+    // 録画中は指定時間で停止
     if (mediaRecorder && mediaRecorder.state === 'recording' && video.ended) {
         mediaRecorder.stop();
         video.pause();
     }
+    // プレビューも更新
+    updateOverlayStyle();
 });
 
 const inputs = form.querySelectorAll('input[type="range"], input[type="number"]');
 inputs.forEach(input => {
     input.addEventListener('input', () => {
+        // 再生中の場合は、リアルタイムにプレビューを更新する
         if (!video.paused) {
             drawFrame();
         }
+        updateOverlayStyle();
     });
 });
