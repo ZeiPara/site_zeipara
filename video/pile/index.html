@@ -9,12 +9,19 @@
 
     <form id="editor-form">
         <div class="container">
-            <video id="background-video" src="動画BのURL" controls></video>
-            <img id="overlay-img" src="画像AのURL" alt="重ねる画像">
+            <video id="background-video" controls></video>
+            <img id="overlay-img" alt="重ねる画像">
             <canvas id="output-canvas" style="display: none;"></canvas>
         </div>
 
         <div class="controls">
+            <label>
+                動画Bをアップロード: <input type="file" id="video-upload" accept="video/*">
+            </label>
+            <label>
+                画像Aをアップロード: <input type="file" id="image-upload" accept="image/*">
+            </label>
+
             <label>
                 開始秒数: <input type="number" id="start-time" value="3">
             </label>
