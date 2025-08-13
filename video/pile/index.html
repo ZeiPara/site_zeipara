@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>動画に画像を重ねるデモ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <form id="editor-form">
+        <div class="container">
+            <video id="background-video" src="動画BのURL" controls></video>
+            <img id="overlay-img" src="画像AのURL" alt="重ねる画像">
+            <canvas id="output-canvas" style="display: none;"></canvas>
+        </div>
+
+        <div class="controls">
+            <label>
+                開始秒数: <input type="number" id="start-time" value="3">
+            </label>
+            <label>
+                終了秒数: <input type="number" id="end-time" value="5">
+            </label>
+            <label>
+                X座標: <input type="range" id="x-slider" min="0" max="500" value="50">
+            </label>
+            <label>
+                Y座標: <input type="range" id="y-slider" min="0" max="500" value="50">
+            </label>
+            <label>
+                大きさ: <input type="range" id="size-slider" min="10" max="200" value="100">
+            </label>
+            <label>
+                角度: <input type="range" id="rotate-slider" min="0" max="360" value="0">
+            </label>
+            
+            <button type="submit">動画をダウンロード</button>
+        </div>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+</html>
