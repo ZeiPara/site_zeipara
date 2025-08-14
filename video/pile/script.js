@@ -36,39 +36,31 @@ imageUpload.addEventListener('change', (event) => {
     }
 });
 
-
+// 動画のメタデータが読み込まれたらスライダーを調整
 video.addEventListener('loadedmetadata', () => {
-    // 動画のサイズに合わせてCanvasのサイズを調整
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // スライダーの最大値を動画のサイズに合わせる
-    xSlider.max = video.videoWidth - 100; // 画像の大きさを考慮して調整
-    ySlider.max = video.videoHeight - 100; // 画像の大きさを考慮して調整
-    // 画像が動画に収まる最大の大きさを計算
+    xSlider.max = video.videoWidth;
+    ySlider.max = video.videoHeight;
     sizeSlider.max = Math.min(video.videoWidth, video.videoHeight);
 
-    // 初期値をリセット
-    xSlider.value = 50;
-    ySlider.value = 50;
-    sizeSlider.value = 100; 
+    xSlider.value = 0;
+    ySlider.value = 0;
+    sizeSlider.value = 50; 
     rotateSlider.value = 0;
     
-    // スライダーの表示値を更新
     updateOverlayStyle();
 });
 
 function drawFrame() {
-    // Canvasをクリア
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // 動画のフレームを描画
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const currentTime = video.currentTime;
     const startTime = parseFloat(startTimeInput.value);
     const endTime = parseFloat(endTimeInput.value);
 
-    // 画像Aが表示される時間帯かチェック
     if (overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
         const x = parseFloat(xSlider.value);
         const y = parseFloat(ySlider.value);
@@ -83,16 +75,13 @@ function drawFrame() {
     }
 }
 
-// プレビュー用の関数。CSSで画像を直接動かすため
 function updateOverlayStyle() {
     const x = xSlider.value;
     const y = ySlider.value;
     const size = sizeSlider.value;
     const rotate = rotateSlider.value;
 
-    // overlayImgが存在するか確認
     if (overlayImg.src) {
-        overlayImg.style.display = 'block';
         overlayImg.style.left = `${x}px`;
         overlayImg.style.top = `${y}px`;
         overlayImg.style.width = `${size}px`;
@@ -101,7 +90,7 @@ function updateOverlayStyle() {
 }
 
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if (!video.src) {
@@ -113,9 +102,11 @@ form.addEventListener('submit', async (e) => {
     downloadButton.disabled = true;
     downloadButton.textContent = 'ダウンロード中...';
 
-    video.currentTime = 0;
+    // 録画前に一度動画の再生を停止
     video.pause();
+    video.currentTime = 0;
 
+    // Canvasからストリームを取得してMediaRecorderを開始
     const stream = canvas.captureStream(30);
     mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
@@ -127,9 +118,7 @@ form.addEventListener('submit', async (e) => {
     };
 
     mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, {
-            type: 'video/webm'
-        });
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
         
         const a = document.createElement('a');
@@ -143,33 +132,27 @@ form.addEventListener('submit', async (e) => {
         
         downloadButton.disabled = false;
         downloadButton.textContent = '動画をダウンロード';
+        video.pause(); // 念のため録画終了後も停止
     };
 
     mediaRecorder.start();
 
-    // 録画を開始
-    video.currentTime = 0;
+    // 録画開始と同時に動画の再生も開始
     video.play();
     
     // 描画ループを開始
     drawInterval = setInterval(() => {
         drawFrame();
-    }, 1000 / 30);
-
-    // ★★★ここから追加★★★
-    // 動画の長さが取得可能になってからタイマーを設定する
-    video.addEventListener('loadedmetadata', () => {
-        // 動画の長さに少し余裕を持たせて録画を停止する
-        setTimeout(() => {
+        // ここで動画が終了したら録画も停止
+        if (video.ended) {
+            clearInterval(drawInterval);
             if (mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
-                clearInterval(drawInterval);
-                video.pause();
             }
-        }, video.duration * 1000 + 500); // 500msの余裕
-    }, { once: true }); // イベントリスナーを1度だけ実行
-    // ★★★ここまで追加★★★
+        }
+    }, 1000 / 30);
 });
+
 
 video.addEventListener('timeupdate', () => {
     // プレビューのオーバーレイを更新
