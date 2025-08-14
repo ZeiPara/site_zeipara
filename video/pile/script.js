@@ -31,8 +31,8 @@ videoUpload.addEventListener('change', (event) => {
 imageUpload.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
-        const imageURL = URL.createObjectURL(file);
-        overlayImg.src = imageURL;
+            const imageURL = URL.createObjectURL(file);
+            overlayImg.src = imageURL;
     }
 });
 
@@ -62,10 +62,13 @@ function drawFrame() {
     const endTime = parseFloat(endTimeInput.value);
 
     if (overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
+        // !!!---ここを修正---!!!
+        // 描画時に最新のスライダー値を読み込む
         const x = parseFloat(xSlider.value);
         const y = parseFloat(ySlider.value);
         const size = parseFloat(sizeSlider.value);
         const rotate = parseFloat(rotateSlider.value);
+        // !!!---ここまで修正---!!!
         
         ctx.save();
         ctx.translate(x + size / 2, y + size / 2);
@@ -118,7 +121,6 @@ form.addEventListener('submit', (e) => {
     mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         
-        // recordedChunksが空でないか確認
         if (blob.size === 0) {
             alert('動画データの作成に失敗しました。');
             downloadButton.disabled = false;
@@ -144,10 +146,8 @@ form.addEventListener('submit', (e) => {
 
     mediaRecorder.start();
 
-    // 動画再生と同時に録画開始
     video.play();
     
-    // video.endedイベントで録画を停止する
     const stopRecordingOnEnd = () => {
         clearInterval(drawInterval);
         if (mediaRecorder.state === 'recording') {
@@ -157,7 +157,6 @@ form.addEventListener('submit', (e) => {
     };
     video.addEventListener('ended', stopRecordingOnEnd);
     
-    // 描画ループも開始
     drawInterval = setInterval(drawFrame, 1000 / 30);
 });
 
