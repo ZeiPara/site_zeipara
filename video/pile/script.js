@@ -102,11 +102,9 @@ form.addEventListener('submit', (e) => {
     downloadButton.disabled = true;
     downloadButton.textContent = 'ダウンロード中...';
 
-    // 録画前に一度動画の再生を停止
     video.pause();
     video.currentTime = 0;
 
-    // Canvasからストリームを取得してMediaRecorderを開始
     const stream = canvas.captureStream(30);
     mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
@@ -119,6 +117,15 @@ form.addEventListener('submit', (e) => {
 
     mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        
+        // recordedChunksが空でないか確認
+        if (blob.size === 0) {
+            alert('動画データの作成に失敗しました。');
+            downloadButton.disabled = false;
+            downloadButton.textContent = '動画をダウンロード';
+            return;
+        }
+
         const url = URL.createObjectURL(blob);
         
         const a = document.createElement('a');
@@ -132,37 +139,36 @@ form.addEventListener('submit', (e) => {
         
         downloadButton.disabled = false;
         downloadButton.textContent = '動画をダウンロード';
-        video.pause(); // 念のため録画終了後も停止
+        video.pause();
     };
 
     mediaRecorder.start();
 
-    // 録画開始と同時に動画の再生も開始
+    // 動画再生と同時に録画開始
     video.play();
     
-    // 描画ループを開始
-    drawInterval = setInterval(() => {
-        drawFrame();
-        // ここで動画が終了したら録画も停止
-        if (video.ended) {
-            clearInterval(drawInterval);
-            if (mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
+    // video.endedイベントで録画を停止する
+    const stopRecordingOnEnd = () => {
+        clearInterval(drawInterval);
+        if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
         }
-    }, 1000 / 30);
+        video.removeEventListener('ended', stopRecordingOnEnd);
+    };
+    video.addEventListener('ended', stopRecordingOnEnd);
+    
+    // 描画ループも開始
+    drawInterval = setInterval(drawFrame, 1000 / 30);
 });
 
 
 video.addEventListener('timeupdate', () => {
-    // プレビューのオーバーレイを更新
     updateOverlayStyle();
 
     const currentTime = video.currentTime;
     const startTime = parseFloat(startTimeInput.value);
     const endTime = parseFloat(endTimeInput.value);
 
-    // プレビュー用の画像表示/非表示を切り替える
     if (overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
         overlayImg.style.display = 'block';
     } else {
@@ -170,7 +176,6 @@ video.addEventListener('timeupdate', () => {
     }
 });
 
-// スライダーや入力値が変更されたらプレビューを更新
 const inputs = form.querySelectorAll('input[type="range"], input[type="number"]');
 inputs.forEach(input => {
     input.addEventListener('input', () => {
