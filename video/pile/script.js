@@ -100,7 +100,7 @@ function updateOverlayStyle() {
     }
 }
 
-// フォームの送信（ダウンロードボタンクリック）時の処理
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -109,16 +109,14 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // ダウンロードボタンを無効化
     const downloadButton = e.target.querySelector('button[type="submit"]');
     downloadButton.disabled = true;
     downloadButton.textContent = 'ダウンロード中...';
 
     video.currentTime = 0;
-    video.pause(); // プレビュー用の動画は一時停止
+    video.pause();
 
-    // Canvasからストリームを取得
-    const stream = canvas.captureStream(30); // フレームレートを30fpsに設定
+    const stream = canvas.captureStream(30);
     mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
     recordedChunks = [];
@@ -143,7 +141,6 @@ form.addEventListener('submit', async (e) => {
         window.URL.revokeObjectURL(url);
         recordedChunks = [];
         
-        // ボタンを元に戻す
         downloadButton.disabled = false;
         downloadButton.textContent = '動画をダウンロード';
     };
@@ -157,15 +154,21 @@ form.addEventListener('submit', async (e) => {
     // 描画ループを開始
     drawInterval = setInterval(() => {
         drawFrame();
-    }, 1000 / 30); // 30fpsで描画
-});
+    }, 1000 / 30);
 
-// 動画の再生が終了したら録画も停止
-video.addEventListener('ended', () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        clearInterval(drawInterval);
-    }
+    // ★★★ここから追加★★★
+    // 動画の長さが取得可能になってからタイマーを設定する
+    video.addEventListener('loadedmetadata', () => {
+        // 動画の長さに少し余裕を持たせて録画を停止する
+        setTimeout(() => {
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                clearInterval(drawInterval);
+                video.pause();
+            }
+        }, video.duration * 1000 + 500); // 500msの余裕
+    }, { once: true }); // イベントリスナーを1度だけ実行
+    // ★★★ここまで追加★★★
 });
 
 video.addEventListener('timeupdate', () => {
