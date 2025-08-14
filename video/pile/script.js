@@ -31,8 +31,8 @@ videoUpload.addEventListener('change', (event) => {
 imageUpload.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
-            const imageURL = URL.createObjectURL(file);
-            overlayImg.src = imageURL;
+        const imageURL = URL.createObjectURL(file);
+        overlayImg.src = imageURL;
     }
 });
 
@@ -53,6 +53,7 @@ video.addEventListener('loadedmetadata', () => {
     updateOverlayStyle();
 });
 
+// Canvasにフレームを描画する関数
 function drawFrame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -61,14 +62,12 @@ function drawFrame() {
     const startTime = parseFloat(startTimeInput.value);
     const endTime = parseFloat(endTimeInput.value);
 
-    if (overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
-        // !!!---ここを修正---!!!
-        // 描画時に最新のスライダー値を読み込む
+    // 画像が読み込まれていて、かつ指定された時間内なら描画
+    if (overlayImg.complete && overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
         const x = parseFloat(xSlider.value);
         const y = parseFloat(ySlider.value);
         const size = parseFloat(sizeSlider.value);
         const rotate = parseFloat(rotateSlider.value);
-        // !!!---ここまで修正---!!!
         
         ctx.save();
         ctx.translate(x + size / 2, y + size / 2);
@@ -78,6 +77,7 @@ function drawFrame() {
     }
 }
 
+// プレビュー用の関数。CSSで画像を直接動かすため
 function updateOverlayStyle() {
     const x = xSlider.value;
     const y = ySlider.value;
@@ -92,7 +92,7 @@ function updateOverlayStyle() {
     }
 }
 
-
+// !!! --- ここを大きく修正したよ --- !!!
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -105,62 +105,72 @@ form.addEventListener('submit', (e) => {
     downloadButton.disabled = true;
     downloadButton.textContent = 'ダウンロード中...';
 
+    // 録画前に一度動画の再生を停止
     video.pause();
     video.currentTime = 0;
 
-    const stream = canvas.captureStream(30);
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    // 画像が読み込まれていない場合は、読み込みを待つ
+    const startRecording = () => {
+        const stream = canvas.captureStream(30);
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
-    recordedChunks = [];
-    mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-        }
-    };
+        recordedChunks = [];
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
 
-    mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        
-        if (blob.size === 0) {
-            alert('動画データの作成に失敗しました。');
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            
+            if (blob.size === 0) {
+                alert('動画データの作成に失敗しました。');
+                downloadButton.disabled = false;
+                downloadButton.textContent = '動画をダウンロード';
+                return;
+            }
+
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'edited_video.webm';
+            document.body.appendChild(a);
+            a.click();
+            
+            window.URL.revokeObjectURL(url);
+            recordedChunks = [];
+            
             downloadButton.disabled = false;
             downloadButton.textContent = '動画をダウンロード';
-            return;
-        }
+            video.pause();
+        };
 
-        const url = URL.createObjectURL(blob);
+        mediaRecorder.start();
+        video.play();
         
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'edited_video.webm';
-        document.body.appendChild(a);
-        a.click();
+        const stopRecordingOnEnd = () => {
+            clearInterval(drawInterval);
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            video.removeEventListener('ended', stopRecordingOnEnd);
+        };
+        video.addEventListener('ended', stopRecordingOnEnd);
         
-        window.URL.revokeObjectURL(url);
-        recordedChunks = [];
-        
-        downloadButton.disabled = false;
-        downloadButton.textContent = '動画をダウンロード';
-        video.pause();
+        drawInterval = setInterval(drawFrame, 1000 / 30);
     };
 
-    mediaRecorder.start();
-
-    video.play();
-    
-    const stopRecordingOnEnd = () => {
-        clearInterval(drawInterval);
-        if (mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-        }
-        video.removeEventListener('ended', stopRecordingOnEnd);
-    };
-    video.addEventListener('ended', stopRecordingOnEnd);
-    
-    drawInterval = setInterval(drawFrame, 1000 / 30);
+    // 画像がまだ読み込まれていない場合
+    if (!overlayImg.complete) {
+        overlayImg.onload = startRecording;
+    } else {
+        startRecording();
+    }
 });
 
-
+// 動画再生中のプレビュー処理
 video.addEventListener('timeupdate', () => {
     updateOverlayStyle();
 
@@ -168,6 +178,7 @@ video.addEventListener('timeupdate', () => {
     const startTime = parseFloat(startTimeInput.value);
     const endTime = parseFloat(endTimeInput.value);
 
+    // overlayImgの表示/非表示を切り替える
     if (overlayImg.src && currentTime >= startTime && currentTime <= endTime) {
         overlayImg.style.display = 'block';
     } else {
@@ -175,6 +186,7 @@ video.addEventListener('timeupdate', () => {
     }
 });
 
+// スライダーや入力値が変更されたらプレビューを更新
 const inputs = form.querySelectorAll('input[type="range"], input[type="number"]');
 inputs.forEach(input => {
     input.addEventListener('input', () => {
