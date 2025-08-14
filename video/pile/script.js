@@ -16,6 +16,18 @@ const endTimeInput = document.getElementById('end-time');
 let mediaRecorder;
 let recordedChunks = [];
 let drawInterval;
+let ffmpeg = null; // FFmpegインスタンスを管理する変数を追加
+
+// FFmpegインスタンスを初期化する関数
+const createFFmpeg = async () => {
+    if (ffmpeg) {
+        return ffmpeg;
+    }
+    const { createFFmpeg } = FFmpeg;
+    ffmpeg = createFFmpeg({ log: true });
+    await ffmpeg.load();
+    return ffmpeg;
+};
 
 // 動画ファイルの読み込み処理
 videoUpload.addEventListener('change', (event) => {
@@ -92,8 +104,7 @@ function updateOverlayStyle() {
     }
 }
 
-// !!! --- ここを大きく修正したよ --- !!!
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => { // asyncを追加
     e.preventDefault();
 
     if (!video.src) {
@@ -105,69 +116,84 @@ form.addEventListener('submit', (e) => {
     downloadButton.disabled = true;
     downloadButton.textContent = 'ダウンロード中...';
 
-    // 録画前に一度動画の再生を停止
     video.pause();
     video.currentTime = 0;
 
-    // 画像が読み込まれていない場合は、読み込みを待つ
-    const startRecording = () => {
-        const stream = canvas.captureStream(30);
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const stream = canvas.captureStream(30);
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                recordedChunks.push(event.data);
-            }
-        };
-
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            
-            if (blob.size === 0) {
-                alert('動画データの作成に失敗しました。');
-                downloadButton.disabled = false;
-                downloadButton.textContent = '動画をダウンロード';
-                return;
-            }
-
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'edited_video.webm';
-            document.body.appendChild(a);
-            a.click();
-            
-            window.URL.revokeObjectURL(url);
-            recordedChunks = [];
-            
-            downloadButton.disabled = false;
-            downloadButton.textContent = '動画をダウンロード';
-            video.pause();
-        };
-
-        mediaRecorder.start();
-        video.play();
-        
-        const stopRecordingOnEnd = () => {
-            clearInterval(drawInterval);
-            if (mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-            video.removeEventListener('ended', stopRecordingOnEnd);
-        };
-        video.addEventListener('ended', stopRecordingOnEnd);
-        
-        drawInterval = setInterval(drawFrame, 1000 / 30);
+    recordedChunks = [];
+    mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
     };
 
-    // 画像がまだ読み込まれていない場合
-    if (!overlayImg.complete) {
-        overlayImg.onload = startRecording;
-    } else {
-        startRecording();
-    }
+    // ダウンロード処理をMP4変換後に実行するように変更
+    mediaRecorder.onstop = async () => { // asyncを追加
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        
+        if (blob.size === 0) {
+            alert('動画データの作成に失敗しました。');
+            downloadButton.disabled = false;
+            downloadButton.textContent = '動画をダウンロード';
+            return;
+        }
+
+        // WebMデータをFFmpegに渡す
+        const inputFileName = 'input.webm';
+        const outputFileName = 'edited_video.mp4';
+        
+        // FFmpegインスタンスを生成
+        const ffmpeg = await createFFmpeg();
+        
+        // ファイルシステムにWebMを書き込む
+        const arrayBuffer = await blob.arrayBuffer();
+        ffmpeg.FS('writeFile', inputFileName, new Uint8Array(arrayBuffer));
+        
+        // FFmpegコマンドを実行してMP4に変換
+        // -c:v copy で動画ストリームをそのままコピーすることで変換を高速化する
+        await ffmpeg.run('-i', inputFileName, '-c:v', 'libx264', '-crf', '23', outputFileName);
+        
+        // 変換されたMP4を読み込む
+        const mp4Data = ffmpeg.FS('readFile', outputFileName);
+        const mp4Blob = new Blob([mp4Data.buffer], { type: 'video/mp4' });
+        
+        // ダウンロード用のリンクを作成してクリック
+        const url = URL.createObjectURL(mp4Blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = outputFileName;
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+        
+        // ファイルシステムをクリーンアップ
+        ffmpeg.FS('unlink', inputFileName);
+        ffmpeg.FS('unlink', outputFileName);
+
+        recordedChunks = [];
+        downloadButton.disabled = false;
+        downloadButton.textContent = '動画をダウンロード';
+        video.pause();
+    };
+
+    mediaRecorder.start();
+
+    video.play();
+    
+    const stopRecordingOnEnd = () => {
+        clearInterval(drawInterval);
+        if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        video.removeEventListener('ended', stopRecordingOnEnd);
+    };
+    video.addEventListener('ended', stopRecordingOnEnd);
+    
+    drawInterval = setInterval(drawFrame, 1000 / 30);
 });
 
 // 動画再生中のプレビュー処理
