@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>動画と音声の合成</title>
+</head>
+<body>
+    <h1>動画に音声を重ねる</h1>
+
+    <div>
+        <label for="videoFile">動画ファイルを選択:</label>
+        <input type="file" id="videoFile" accept="video/*">
+    </div>
+
+    <div>
+        <label for="audioFile">音声ファイルを選択:</label>
+        <input type="file" id="audioFile" accept="audio/*">
+    </div>
+
+    <div>
+        <label for="startSecond">重ねる秒数:</label>
+        <input type="number" id="startSecond" value="0" min="0"> 秒
+    </div>
+
+    <button id="mergeButton">合成して再生</button>
+
+    <video id="outputVideo" controls></video>
+
+    <script src="script.js"></script>
+</body>
+</html>
