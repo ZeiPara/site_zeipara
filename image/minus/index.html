@@ -94,4 +94,123 @@
         
         <div class="input-group">
             <label for="image1">画像 1:</label>
-            <input type="file" id="image1
+            <input type="file" id="image1" accept="image/*">
+        </div>
+        
+        <div class="input-group">
+            <label for="image2">画像 2:</label>
+            <input type="file" id="image2" accept="image/*">
+        </div>
+
+        <button class="button" onclick="processImages()">画像を比較</button>
+        
+        <p id="message"></p>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <h2>比較結果</h2>
+        <canvas id="resultCanvas"></canvas>
+    </div>
+
+    <script>
+        let image1 = new Image();
+        let image2 = new Image();
+        let image1Loaded = false;
+        let image2Loaded = false;
+        const messageElement = document.getElementById('message');
+
+        function showMessage(msg, isError = true) {
+            messageElement.textContent = msg;
+            messageElement.style.color = isError ? '#e74c3c' : '#27ae60';
+            messageElement.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageElement.style.display = 'none';
+        }
+
+        function handleImageLoad(img, id, isFirst) {
+            const file = document.getElementById(id).files[0];
+            if (!file) return;
+
+            img.onload = () => {
+                if (isFirst) {
+                    image1Loaded = true;
+                } else {
+                    image2Loaded = true;
+                }
+                
+                // 両方の画像が読み込まれたかチェック
+                if (image1Loaded && image2Loaded) {
+                    hideMessage();
+                }
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        document.getElementById('image1').addEventListener('change', (e) => handleImageLoad(image1, 'image1', true));
+        document.getElementById('image2').addEventListener('change', (e) => handleImageLoad(image2, 'image2', false));
+
+        function processImages() {
+            if (!image1Loaded || !image2Loaded) {
+                showMessage('2つの画像をアップロードしてください。');
+                return;
+            }
+
+            // 画像サイズの比較
+            if (image1.width !== image2.width || image1.height !== image2.height) {
+                showMessage('画像のサイズが違います。同じサイズの画像をアップロードしてください。');
+                return;
+            }
+
+            hideMessage();
+            const canvas = document.getElementById('resultCanvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = image1.width;
+            canvas.height = image1.height;
+
+            // 1枚目の画像を描画
+            ctx.drawImage(image1, 0, 0);
+            const imageData1 = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            // 2枚目の画像を描画
+            ctx.drawImage(image2, 0, 0);
+            const imageData2 = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            const newImageData = ctx.createImageData(canvas.width, canvas.height);
+
+            // ピクセルごとの比較と新しい画像の作成
+            for (let i = 0; i < imageData1.data.length; i += 4) {
+                const r1 = imageData1.data[i];
+                const g1 = imageData1.data[i + 1];
+                const b1 = imageData1.data[i + 2];
+
+                const r2 = imageData2.data[i];
+                const g2 = imageData2.data[i + 1];
+                const b2 = imageData2.data[i + 2];
+
+                // RGB値が完全に一致する場合
+                if (r1 === r2 && g1 === g2 && b1 === b2) {
+                    // 白色にする
+                    newImageData.data[i] = 255;      // R
+                    newImageData.data[i + 1] = 255;  // G
+                    newImageData.data[i + 2] = 255;  // B
+                    newImageData.data[i + 3] = 255;  // A (不透明)
+                } else {
+                    // 差分がある場合、元の画像の色をそのまま使う
+                    newImageData.data[i] = r1;
+                    newImageData.data[i + 1] = g1;
+                    newImageData.data[i + 2] = b1;
+                    newImageData.data[i + 3] = 255; // A (不透明)
+                }
+            }
+
+            // 新しい画像をCanvasに描画
+            ctx.putImageData(newImageData, 0, 0);
+            
+            document.getElementById('resultContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
