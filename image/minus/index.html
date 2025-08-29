@@ -67,7 +67,9 @@
             margin-top: 2rem;
             border-top: 2px solid #ecf0f1;
             padding-top: 2rem;
-            display: none; /* 初期状態では非表示 */
+            display: none;
+            flex-direction: column;
+            align-items: center;
         }
 
         canvas {
@@ -83,6 +85,21 @@
             font-size: 1.1em;
             color: #e74c3c;
             display: none;
+        }
+
+        #downloadLink {
+            margin-top: 1rem;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: none; /* 初期状態では非表示 */
+            transition: background-color 0.3s ease;
+        }
+
+        #downloadLink:hover {
+            background-color: #219d53;
         }
     </style>
 </head>
@@ -110,6 +127,7 @@
     <div class="result-container" id="resultContainer">
         <h2>比較結果</h2>
         <canvas id="resultCanvas"></canvas>
+        <a id="downloadLink" href="#" download="difference.png">結果をダウンロード</a>
     </div>
 
     <script>
@@ -118,6 +136,7 @@
         let image1Loaded = false;
         let image2Loaded = false;
         const messageElement = document.getElementById('message');
+        const downloadLink = document.getElementById('downloadLink');
 
         function showMessage(msg, isError = true) {
             messageElement.textContent = msg;
@@ -140,7 +159,6 @@
                     image2Loaded = true;
                 }
                 
-                // 両方の画像が読み込まれたかチェック
                 if (image1Loaded && image2Loaded) {
                     hideMessage();
                 }
@@ -157,7 +175,6 @@
                 return;
             }
 
-            // 画像サイズの比較
             if (image1.width !== image2.width || image1.height !== image2.height) {
                 showMessage('画像のサイズが違います。同じサイズの画像をアップロードしてください。');
                 return;
@@ -170,17 +187,14 @@
             canvas.width = image1.width;
             canvas.height = image1.height;
 
-            // 1枚目の画像を描画
             ctx.drawImage(image1, 0, 0);
             const imageData1 = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-            // 2枚目の画像を描画
             ctx.drawImage(image2, 0, 0);
             const imageData2 = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
             const newImageData = ctx.createImageData(canvas.width, canvas.height);
 
-            // ピクセルごとの比較と新しい画像の作成
             for (let i = 0; i < imageData1.data.length; i += 4) {
                 const r1 = imageData1.data[i];
                 const g1 = imageData1.data[i + 1];
@@ -190,26 +204,27 @@
                 const g2 = imageData2.data[i + 1];
                 const b2 = imageData2.data[i + 2];
 
-                // RGB値が完全に一致する場合
                 if (r1 === r2 && g1 === g2 && b1 === b2) {
-                    // 白色にする
-                    newImageData.data[i] = 255;      // R
-                    newImageData.data[i + 1] = 255;  // G
-                    newImageData.data[i + 2] = 255;  // B
-                    newImageData.data[i + 3] = 255;  // A (不透明)
+                    newImageData.data[i] = 255;
+                    newImageData.data[i + 1] = 255;
+                    newImageData.data[i + 2] = 255;
+                    newImageData.data[i + 3] = 255;
                 } else {
-                    // 差分がある場合、元の画像の色をそのまま使う
                     newImageData.data[i] = r1;
                     newImageData.data[i + 1] = g1;
                     newImageData.data[i + 2] = b1;
-                    newImageData.data[i + 3] = 255; // A (不透明)
+                    newImageData.data[i + 3] = 255;
                 }
             }
 
-            // 新しい画像をCanvasに描画
             ctx.putImageData(newImageData, 0, 0);
             
-            document.getElementById('resultContainer').style.display = 'block';
+            // Canvasを画像データURLに変換してダウンロードリンクに設定
+            const dataURL = canvas.toDataURL('image/png');
+            downloadLink.href = dataURL;
+            downloadLink.style.display = 'block';
+            
+            document.getElementById('resultContainer').style.display = 'flex';
         }
     </script>
 </body>
