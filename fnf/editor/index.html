@@ -4,7 +4,7 @@
     <title>fnfエディタ</title>
     <style>
       .maincontent {
-        display = none;
+        display: none;
       }
     </style>
   </head>
@@ -16,36 +16,71 @@
     </div>
     <div class="maincontent"></div>
     <script>
-      function byouga(nyuuryoku) {
-        for (const difficulity in nyuuryoku[notes]) {
-          for (const note in nyuuryoku[notes][difficulity]) {
-            let spaaaan = document.createElement("span");
-            spaaaan.src = `https://zeipara.f5.si/sozai/${str(note[d] % 4)}`;
-            spaaaan.style.position = "relative";
-            spaaaan.style.top = note[t] / 100;
-            spaaaan.style.left = note[d] * 20;
-            document.querySelector(".maincontent").appendChild(spaaaan);
-          }
+      let maindata;
+
+      // 譜面データを描画する関数
+      function byouga(fnfData) {
+        const maincontent = document.querySelector(".maincontent");
+        maincontent.innerHTML = ''; // 既存の内容をクリア
+
+        // 難易度ごとにループ
+        for (const difficulty in fnfData.notes) {
+          // 各難易度のセクションをループ
+          const sections = fnfData.notes[difficulty];
+          sections.forEach(section => {
+            // 各セクション内のノーツをループ
+            if (section.p && Array.isArray(section.p)) {
+              section.p.forEach(note => {
+                const noteImage = document.createElement("img");
+                const arrowDirection = note.d % 4; // 0:左, 1:下, 2:上, 3:右
+                
+                noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`; // 画像パスを修正
+                noteImage.style.position = "absolute";
+                noteImage.style.top = `${note.t / 10}px`; // トップの位置は時間に依存
+                noteImage.style.left = `${arrowDirection * 80}px`; // 左の位置は矢印の方向によって決定
+                
+                // ホールドノーツの描画
+                if (note.l > 0) {
+                  // ここにホールドノーツを描画するロジックを追加
+                }
+                
+                maincontent.appendChild(noteImage);
+              });
+            }
+          });
         }
       }
-      
+
       window.onload = function() {
-        maindata = {"version": "2.0.0","scrollSpeed": {},"events": [],"notes": {},"generatedBy": "Friday Night Funkin' - v0.5.3"};
+        maindata = {"version": "2.0.0", "scrollSpeed": {}, "events": [], "notes": {}, "generatedBy": "Friday Night Funkin' - v0.5.3"};
+        
         document.getElementById("fnfinputfile").addEventListener("change", function(event) {
-          const filee = event.target.files;
-          if (file.type != json) {
-            alert("json形式で指定してください。");
-            break;
+          const file = event.target.files[0];
+          
+          if (file && file.type === 'application/json') {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              try {
+                maindata = JSON.parse(e.target.result);
+                document.querySelector(".fnfinput").style.display = "none";
+                document.querySelector(".maincontent").style.display = "block";
+                byouga(maindata); // データを読み込んだ後に描画関数を呼び出す
+              } catch (error) {
+                alert("JSONファイルの解析に失敗しました。ファイルが破損している可能性があります。");
+              }
+            };
+            reader.readAsText(file); // ファイルの中身をテキストとして読み込む
+          } else {
+            alert("json形式のファイルを選択してください。");
           }
-          maindata = JSON.parse(filee);
-          document.querySelector(".fnfinput").style.display = "none";
-          document.querySelector("maincontent").style.display = "block";
         });
       }
 
       function onnewspan() {
         document.querySelector(".fnfinput").style.display = "none";
-        document.querySelector("maincontent").style.display = "block";
+        document.querySelector(".maincontent").style.display = "block";
+        // 新規作成の場合の描画処理
+        byouga(maindata);
       }
     </script>
   </body>
