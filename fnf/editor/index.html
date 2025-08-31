@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>fnfエディタ</title>
+    <style>
+      .maincontent {
+        display = none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fnfinput">
+      <span onclick="onnewspan()">新しく作る</span>
+      <p>or</p>
+      <p>ファイルを読み込む:</p><input type="file" id="fnfinputfile">
+    </div>
+    <div class="maincontent"></div>
+    <script>
+      function byouga(nyuuryoku) {
+        for (const difficulity in nyuuryoku[notes]) {
+          for (const note in nyuuryoku[notes][difficulity]) {
+            let spaaaan = document.createElement("span");
+            spaaaan.src = `https://zeipara.f5.si/sozai/${str(note[d] % 4)}`;
+            spaaaan.style.position = "relative";
+            spaaaan.style.top = note[t] / 100;
+            spaaaan.style.left = note[d] * 20;
+            document.querySelector(".maincontent").appendChild(spaaaan);
+          }
+        }
+      }
+      
+      window.onload = function() {
+        maindata = {"version": "2.0.0","scrollSpeed": {},"events": [],"notes": {},"generatedBy": "Friday Night Funkin' - v0.5.3"};
+        document.getElementById("fnfinputfile").addEventListener("change", function(event) {
+          const filee = event.target.files;
+          if (file.type != json) {
+            alert("json形式で指定してください。");
+            break;
+          }
+          maindata = JSON.parse(filee);
+          document.querySelector(".fnfinput").style.display = "none";
+          document.querySelector("maincontent").style.display = "block";
+        });
+      }
+
+      function onnewspan() {
+        document.querySelector(".fnfinput").style.display = "none";
+        document.querySelector("maincontent").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
