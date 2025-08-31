@@ -4,29 +4,34 @@ let maindata;
 function byouga(fnfData) {
   const maincontent = document.querySelector(".maincontent");
   maincontent.innerHTML = '';
-  
-  for (const difficulty in fnfData.notes) {
-    const sections = fnfData.notes[difficulty];
 
-    if (Array.isArray(sections)) {
-      sections.forEach(section => {
-        if (section && Array.isArray(section)) {
-          section.forEach(note => {
-            const noteImage = document.createElement("img");
-            const arrowDirection = note.d % 4;
-            
-            noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
-            noteImage.classList.add("note-image");
-            
-            const pixelsPerMillisecond = 0.05;
-            noteImage.style.top = `${note.t * pixelsPerMillisecond}px`;
+  const notesByDifficulty = fnfData.notes;
 
-            const laneWidth = 100;
-            noteImage.style.left = `${arrowDirection * laneWidth + 50}px`;
-            
-            maincontent.appendChild(noteImage);
-          });
+  for (const difficulty in notesByDifficulty) {
+    const notes = notesByDifficulty[difficulty];
+
+    if (Array.isArray(notes)) {
+      notes.forEach(note => {
+        const noteTime = note.t;
+        const noteDirection = note.d;
+        
+        if (typeof noteTime !== 'number' || typeof noteDirection !== 'number') {
+          return;
         }
+
+        const noteImage = document.createElement("img");
+        const arrowDirection = noteDirection % 4;
+        
+        noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
+        noteImage.classList.add("note-image");
+        
+        const pixelsPerMillisecond = 0.05;
+        noteImage.style.top = `${noteTime * pixelsPerMillisecond}px`;
+        
+        const laneWidth = 100;
+        noteImage.style.left = `${arrowDirection * laneWidth + 50}px`;
+        
+        maincontent.appendChild(noteImage);
       });
     }
   }
