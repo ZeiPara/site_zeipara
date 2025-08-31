@@ -18,9 +18,9 @@ function byouga(fnfData) {
             noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
             noteImage.classList.add("note-image");
             
-            const pixelsPerMillisecond = 0.05; 
+            const pixelsPerMillisecond = 0.05;
             noteImage.style.top = `${note.t * pixelsPerMillisecond}px`;
-            
+
             const laneWidth = 100;
             noteImage.style.left = `${arrowDirection * laneWidth + 50}px`;
             
