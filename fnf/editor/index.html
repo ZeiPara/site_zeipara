@@ -3,25 +3,24 @@
   <head>
     <title>fnfエディタ</title>
     <style>
+      /* 最初の画面（fnfinput）をデフォルトで表示 */
       .fnfinput {
-        display: none;
+        text-align: center;
       }
-      /* 変更点：新しいコンテナのスタイル */
+      /* エディタ画面（editor-container）をデフォルトで非表示 */
       .editor-container {
-        height: 100vh; /* 画面全体の高さ */
-        overflow-y: scroll; /* 縦方向のスクロールを可能にする */
+        display: none; 
+        height: 100vh;
+        overflow-y: scroll;
         position: relative;
-        background-color: #222; /* 背景色を設定 */
+        background-color: black;
         color: white;
       }
-      /* 変更点：ノーツを描画する要素 */
       .maincontent {
-        /* ノーツ全体を格納する、非常に長いコンテナ */
         position: relative;
         width: 100%;
-        min-height: 5000px; /* 縦方向の長さを十分に確保 */
+        min-height: 5000px; 
       }
-      /* ノーツのスタイル */
       .note-image {
         position: absolute;
       }
@@ -31,11 +30,14 @@
     <div class="fnfinput">
       <span onclick="onnewspan()">新しく作る</span>
       <p>or</p>
-      <p>ファイルを読み込む:</p><input type="file" id="fnfinputfile">
+      <p>ファイルを読み込む:</p>
+      <input type="file" id="fnfinputfile">
     </div>
+    
     <div class="editor-container">
       <div class="maincontent"></div>
     </div>
+    
     <script src="main.js"></script>
   </body>
 </html>
