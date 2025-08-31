@@ -19,35 +19,45 @@
       let maindata;
 
       // 譜面データを描画する関数
+      // byouga関数を修正
       function byouga(fnfData) {
         const maincontent = document.querySelector(".maincontent");
         maincontent.innerHTML = ''; // 既存の内容をクリア
-
+      
         // 難易度ごとにループ
         for (const difficulty in fnfData.notes) {
-          // 各難易度のセクションをループ
           const sections = fnfData.notes[difficulty];
-          sections.forEach(section => {
-            // 各セクション内のノーツをループ
-            if (section.p && Array.isArray(section.p)) {
-              section.p.forEach(note => {
-                const noteImage = document.createElement("img");
-                const arrowDirection = note.d % 4; // 0:左, 1:下, 2:上, 3:右
-                
-                noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`; // 画像パスを修正
-                noteImage.style.position = "absolute";
-                noteImage.style.top = `${note.t / 10}px`; // トップの位置は時間に依存
-                noteImage.style.left = `${arrowDirection * 80}px`; // 左の位置は矢印の方向によって決定
-                
-                // ホールドノーツの描画
-                if (note.l > 0) {
-                  // ここにホールドノーツを描画するロジックを追加
-                }
-                
-                maincontent.appendChild(noteImage);
-              });
-            }
-          });
+
+          // 各難易度のセクションをループ
+          if (Array.isArray(sections)) {
+            sections.forEach(section => {
+              // 各セクション内のノーツをループ
+              if (section.p && Array.isArray(section.p)) {
+                section.p.forEach(note => {
+                  // ここでノーツを描画する処理を行う
+            
+                  // t (タイミング) と d (ノーツの種類) にアクセス
+                  const noteTime = note.t;
+                  const noteDirection = note.d;
+            
+                  // <img>要素を作成してノーツ画像を表示
+                  const noteImage = document.createElement("img");
+                  // ノーツの方向（0-3）に応じて画像パスを決定
+                  const arrowDirection = noteDirection % 4; 
+                  noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
+            
+                  // 位置を設定（`top`は時間、`left`は種類に応じて調整）
+                  noteImage.style.position = "absolute";
+                  // 時間（ミリ秒）に応じて縦の位置を決定
+                  noteImage.style.top = `${noteTime / 10}px`; 
+                  // 矢印の方向に応じて横の位置を決定
+                  noteImage.style.left = `${arrowDirection * 80}px`; 
+            
+                  maincontent.appendChild(noteImage);
+                });
+              }
+            });
+          }
         }
       }
 
