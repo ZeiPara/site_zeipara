@@ -10,8 +10,8 @@ function byouga(fnfData) {
 
     if (Array.isArray(sections)) {
       sections.forEach(section => {
-        if (section.p && Array.isArray(section.p)) {
-          section.p.forEach(note => {
+        if (section && Array.isArray(section)) {
+          section.forEach(note => {
             const noteImage = document.createElement("img");
             const arrowDirection = note.d % 4;
             
