@@ -3,8 +3,27 @@
   <head>
     <title>fnfエディタ</title>
     <style>
-      .maincontent {
+      .fnfinput {
         display: none;
+      }
+      /* 変更点：新しいコンテナのスタイル */
+      .editor-container {
+        height: 100vh; /* 画面全体の高さ */
+        overflow-y: scroll; /* 縦方向のスクロールを可能にする */
+        position: relative;
+        background-color: #222; /* 背景色を設定 */
+        color: white;
+      }
+      /* 変更点：ノーツを描画する要素 */
+      .maincontent {
+        /* ノーツ全体を格納する、非常に長いコンテナ */
+        position: relative;
+        width: 100%;
+        min-height: 5000px; /* 縦方向の長さを十分に確保 */
+      }
+      /* ノーツのスタイル */
+      .note-image {
+        position: absolute;
       }
     </style>
   </head>
@@ -14,84 +33,9 @@
       <p>or</p>
       <p>ファイルを読み込む:</p><input type="file" id="fnfinputfile">
     </div>
-    <div class="maincontent"></div>
-    <script>
-      let maindata;
-
-      // 譜面データを描画する関数
-      // byouga関数を修正
-      function byouga(fnfData) {
-        const maincontent = document.querySelector(".maincontent");
-        maincontent.innerHTML = ''; // 既存の内容をクリア
-      
-        // 難易度ごとにループ
-        for (const difficulty in fnfData.notes) {
-          const sections = fnfData.notes[difficulty];
-
-          // 各難易度のセクションをループ
-          if (Array.isArray(sections)) {
-            sections.forEach(section => {
-              // 各セクション内のノーツをループ
-              if (section.p && Array.isArray(section.p)) {
-                section.p.forEach(note => {
-                  // ここでノーツを描画する処理を行う
-            
-                  // t (タイミング) と d (ノーツの種類) にアクセス
-                  const noteTime = note.t;
-                  const noteDirection = note.d;
-            
-                  // <img>要素を作成してノーツ画像を表示
-                  const noteImage = document.createElement("img");
-                  // ノーツの方向（0-3）に応じて画像パスを決定
-                  const arrowDirection = noteDirection % 4; 
-                  noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
-            
-                  // 位置を設定（`top`は時間、`left`は種類に応じて調整）
-                  noteImage.style.position = "absolute";
-                  // 時間（ミリ秒）に応じて縦の位置を決定
-                  noteImage.style.top = `${noteTime / 10}px`; 
-                  // 矢印の方向に応じて横の位置を決定
-                  noteImage.style.left = `${arrowDirection * 80}px`; 
-            
-                  maincontent.appendChild(noteImage);
-                });
-              }
-            });
-          }
-        }
-      }
-
-      window.onload = function() {
-        maindata = {"version": "2.0.0", "scrollSpeed": {}, "events": [], "notes": {}, "generatedBy": "Friday Night Funkin' - v0.5.3"};
-        
-        document.getElementById("fnfinputfile").addEventListener("change", function(event) {
-          const file = event.target.files[0];
-          
-          if (file && file.type === 'application/json') {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              try {
-                maindata = JSON.parse(e.target.result);
-                document.querySelector(".fnfinput").style.display = "none";
-                document.querySelector(".maincontent").style.display = "block";
-                byouga(maindata); // データを読み込んだ後に描画関数を呼び出す
-              } catch (error) {
-                alert("JSONファイルの解析に失敗しました。ファイルが破損している可能性があります。");
-              }
-            };
-            reader.readAsText(file); // ファイルの中身をテキストとして読み込む
-          } else {
-            alert("json形式のファイルを選択してください。");
-          }
-        });
-      }
-
-      function onnewspan() {
-        document.querySelector(".fnfinput").style.display = "none";
-        document.querySelector(".maincontent").style.display = "block";
-        // 新規作成の場合の描画処理
-        byouga(maindata);
-      }
-    </script>
+    <div class="editor-container">
+      <div class="maincontent"></div>
+    </div>
+    <script src="main.js"></script>
   </body>
 </html>
