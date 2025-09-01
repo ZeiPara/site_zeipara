@@ -5,9 +5,25 @@
   </head>
   <body>
     <form id="foom">
-      問題:<input type="text" required>
-      回答1:<input type="text" required>
-      回答2:<input type="text" required>
+      <p>問題:</p><input type="text" required>
+      <p>回答1:</p><input type="text" id="kaitou" required>
+      <p>回答2:</p><input type="text" id="kaitou" required>
+      <button id="addkaitou">回答を追加</button>
     </form>
+    <script>
+      window.onload = function() {
+        document.getElementById("addkaitou").addEventListener("click", function(event) {;
+          let oyayouso = event.target.parentNode;
+          let itiran = Array.from(oyayouso.querySelectorAll("#kaitou"));
+          let tuika = new DOMParser().parseFromString(`<p>回答:${itiran.length + 1}</p><input type=\"text\" id=\"kaitou\" required><button id=\"kesukaitou\ name=\"${itiran.length + 1}\"">`, "text/html").body.firstElementChild;
+          event.target.before(tuika);
+          Array.from(oyayouso.querySelectorAll("#kesukaitou")).at(-1).addEventListener("click", function(event) {
+            let oyayouso = event.target.parentNode;
+            let xindex = Integer(event.target.name);
+            oyayouso.querySelectorAll("#kaitou").at(xindex).delete();
+          });
+        });
+      }
+    </script>
   </body>
 </html>
