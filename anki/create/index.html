@@ -6,24 +6,36 @@
   <body>
     <form id="foom">
       <p>問題:</p><input type="text" required>
-      <p>回答1:</p><input type="text" id="kaitou" required>
-      <p>回答2:</p><input type="text" id="kaitou" required>
-      <button id="addkaitou">回答を追加</button>
+      <div id="answers-container">
+        <p>回答1:</p><input type="text" class="kaitou" required>
+        <p>回答2:</p><input type="text" class="kaitou" required>
+      </div>
+      <button type="button" id="addkaitou">回答を追加</button>
     </form>
     <script>
-      window.onload = function() {
-        document.getElementById("addkaitou").addEventListener("click", function(event) {;
-          let oyayouso = event.target.parentNode;
-          let itiran = Array.from(oyayouso.querySelectorAll("#kaitou"));
-          let tuika = new DOMParser().parseFromString(`<p>回答:${itiran.length + 1}</p><input type=\"text\" id=\"kaitou\" required><button id=\"kesukaitou\ name=\"${itiran.length + 1}\"">`, "text/html").body.firstElementChild;
-          event.target.before(tuika);
-          Array.from(oyayouso.querySelectorAll("#kesukaitou")).at(-1).addEventListener("click", function(event) {
-            let oyayouso = event.target.parentNode;
-            let xindex = Integer(event.target.name);
-            oyayouso.querySelectorAll("#kaitou").at(xindex).delete();
-          });
-        });
-      }
+      const form = document.getElementById("foom");
+      const addAnswerBtn = document.getElementById("addkaitou");
+      const answersContainer = document.getElementById("answers-container");
+      
+      let answerCount = 2; // 既存の回答数からカウントを開始します
+
+      addAnswerBtn.addEventListener("click", function() {
+        answerCount++;
+        const newAnswerContainer = document.createElement("div");
+        newAnswerContainer.innerHTML = `
+          <p>回答${answerCount}:</p>
+          <input type="text" class="kaitou" required>
+          <button type="button" class="kesukaitou">回答を削除</button>
+        `;
+        answersContainer.appendChild(newAnswerContainer);
+      });
+
+      // イベント委譲により、親要素で削除イベントを処理します
+      answersContainer.addEventListener("click", function(event) {
+        if (event.target.classList.contains("kesukaitou")) {
+          event.target.parentNode.remove();
+        }
+      });
     </script>
   </body>
 </html>
