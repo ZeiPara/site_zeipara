@@ -5,20 +5,40 @@
   </head>
   <body>
     <form id="foom">
-      <p>問題:</p><input type="text" required>
+      <p>問題:</p><input id="question" type="text" required>
       <div id="answers-container">
         <p>回答1:</p><input type="text" class="kaitou" required>
         <p>回答2:</p><input type="text" class="kaitou" required>
       </div>
       <button type="button" id="addkaitou">回答を追加</button>
     </form>
+    <button id="download">
+    <a src="/" id="link">ダウンロード</a>
     <script>
       const form = document.getElementById("foom");
       const addAnswerBtn = document.getElementById("addkaitou");
       const answersContainer = document.getElementById("answers-container");
+      const download = document.getElementById("download");
       
       let answerCount = 2; // 既存の回答数からカウントを開始します
 
+      download.addEventListener("click", function() {
+        let queee = document.querySelectorAll(".kaitou");
+        let data_list = [];
+        queee.forEach(input => {
+          data_list.append(input.value); // 各input要素の入力内容を表示
+        });
+        let mondai = document.getElementById("question").value;
+        let data = {
+          "question": mondai,
+          "answer": data_list
+        };
+        const blob = new Blob([JSON.stringify(data, null, '  ')], {type: 'application\/json'});
+        const url = URL.createObjectURL(blob);
+        const download = document.getElementById("download");
+        download.src = url;
+      })
+      
       addAnswerBtn.addEventListener("click", function() {
         answerCount++;
         const newAnswerContainer = document.createElement("div");
