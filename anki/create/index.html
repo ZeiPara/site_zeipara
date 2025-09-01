@@ -12,32 +12,40 @@
       </div>
       <button type="button" id="addkaitou">回答を追加</button>
     </form>
-    <button id="download">
-    <a src="/" id="link">ダウンロード</a>
+    <input id="seikai" type="number">
+    <button id="download-button">ダウンロード</button>
+    <a href="#" id="link" style="display: none;"></a>
     <script>
       const form = document.getElementById("foom");
       const addAnswerBtn = document.getElementById("addkaitou");
       const answersContainer = document.getElementById("answers-container");
-      const download = document.getElementById("download");
+      const downloadButton = document.getElementById("download-button");
+      const link = document.getElementById("link");
       
       let answerCount = 2; // 既存の回答数からカウントを開始します
 
-      download.addEventListener("click", function() {
-        let queee = document.querySelectorAll(".kaitou");
+      downloadButton.addEventListener("click", function() {
+        let answerInputs = document.querySelectorAll(".kaitou");
         let data_list = [];
-        queee.forEach(input => {
-          data_list.append(input.value); // 各input要素の入力内容を表示
+        answerInputs.forEach(input => {
+          data_list.push(input.value); // push() を使用して配列に要素を追加
         });
         let mondai = document.getElementById("question").value;
+        let seikai = document.getElementById("seikai").value;
         let data = {
           "question": mondai,
+          "seikai": seikai,
           "answer": data_list
         };
-        const blob = new Blob([JSON.stringify(data, null, '  ')], {type: 'application\/json'});
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
-        const download = document.getElementById("download");
-        download.src = url;
-      })
+        
+        link.href = url;
+        link.download = 'data.json';
+        link.click();
+        
+        URL.revokeObjectURL(url); // オブジェクトURLを解放してメモリをクリーンアップ
+      });
       
       addAnswerBtn.addEventListener("click", function() {
         answerCount++;
