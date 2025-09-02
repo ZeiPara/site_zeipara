@@ -1,22 +1,129 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>暗記読み込み</title>
+    <title>暗記読み込み (Memory Load)</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #0056b3;
+      }
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      input[type="file"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      input[type="submit"] {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+      .logs-container {
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
+      .logs {
+        white-space: pre-wrap;
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .log-entry {
+        margin-bottom: 10px;
+      }
+      .error {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
-    <h1>読み込み</h1>
-    <input type="file" id="inputJSON" accept="application/json" multiple />
-    <input type="submit" id="submit" />
-    <div class="logs"></div>
+    <div class="container">
+      <h1>読み込み (Load)</h1>
+      <div class="controls">
+        <input type="file" id="inputJSON" accept="application/json" multiple />
+        <input type="submit" id="submit" value="ファイル読み込み (Load Files)" />
+      </div>
+      <div class="logs-container">
+        <h2>ログ (Logs)</h2>
+        <div class="logs"></div>
+      </div>
+    </div>
+
     <script>
-      document.getElementById("submit").addEventListener("change", function() {
-        const reader = new FileReader();
-        let json_texts = [];
-        for (const file in document.getElementById("inputJSON").value) {
-          json_texts.append(JSON.parse(file));
+      document.getElementById("submit").addEventListener("click", function() {
+        const fileInput = document.getElementById("inputJSON");
+        const files = fileInput.files;
+        const logsDiv = document.querySelector(".logs");
+        logsDiv.innerHTML = ""; // Clear previous logs
+
+        if (files.length === 0) {
+          logsDiv.innerHTML = '<div class="log-entry error">ファイルが選択されていません。 (No files selected.)</div>';
+          return;
         }
-        const logs = document.querySelector("logs");
-        logs.after(String(json_texts));
+
+        let completed = 0;
+        let jsonContents = [];
+
+        for (const file of files) {
+          const reader = new FileReader();
+
+          reader.onload = (event) => {
+            try {
+              const content = event.target.result;
+              const jsonObject = JSON.parse(content);
+              jsonContents.push(jsonObject);
+              logsDiv.innerHTML += `<div class="log-entry">✅ ファイル "${file.name}" が正常に読み込まれました。 (File "${file.name}" loaded successfully.)</div>`;
+            } catch (error) {
+              logsDiv.innerHTML += `<div class="log-entry error">❌ ファイル "${file.name}" の解析に失敗しました: ${error.message} (Failed to parse file "${file.name}": ${error.message})</div>`;
+            } finally {
+              completed++;
+              if (completed === files.length) {
+                // All files have been processed
+                console.log("All JSON contents:", jsonContents);
+                // Here you can process the 'jsonContents' array
+                // For example, display them in the logs div
+                logsDiv.innerHTML += `<div class="log-entry"><br>---<br>すべてのファイルのコンテンツ: <br>${JSON.stringify(jsonContents, null, 2)}</div>`;
+              }
+            }
+          };
+
+          reader.onerror = () => {
+            logsDiv.innerHTML += `<div class="log-entry error">❌ ファイル "${file.name}" の読み込み中にエラーが発生しました。 (An error occurred while reading file "${file.name}".)</div>`;
+            completed++;
+          };
+
+          reader.readAsText(file);
+        }
       });
     </script>
   </body>
