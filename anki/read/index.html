@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>暗記読み込み</title>
+  </head>
+  <body>
+    <h1>読み込み</h1>
+    <input type="file" id="inputJSON" accept="application/json" multiple />
+    <input type="submit" id="submit" />
+    <div class="logs"></div>
+    <script>
+      document.getElementById("submit").addEventListener("change", function() {
+        const reader = new FileReader();
+        let json_texts = [];
+        for (const file in document.getElementById("inputJSON").value) {
+          json_texts.append(JSON.parse(file));
+        }
+        const logs = document.querySelector("logs");
+        logs.after(String(json_texts));
+      });
+    </script>
+  </body>
+</html>
