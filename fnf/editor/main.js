@@ -24,6 +24,8 @@ function byouga(fnfData) {
         
         noteImage.src = `https://zeipara.f5.si/sozai/${arrowDirection}.png`;
         noteImage.classList.add("note-image");
+        noteImage.style.width = "100px";
+        noteImage.style.height = "auto";
         
         const pixelsPerMillisecond = 0.05;
         noteImage.style.top = `${noteTime * pixelsPerMillisecond}px`;
