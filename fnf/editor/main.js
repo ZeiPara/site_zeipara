@@ -31,7 +31,7 @@ function byouga(fnfData) {
         noteImage.style.top = `${noteTime * pixelsPerMillisecond}px`;
         
         const laneWidth = 100;
-        noteImage.style.left = `${arrowDirection * laneWidth + 50}px`;
+        noteImage.style.left = `${noteDirection * laneWidth + 50}px`;
         
         maincontent.appendChild(noteImage);
       });
