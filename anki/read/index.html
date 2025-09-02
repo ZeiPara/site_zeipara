@@ -200,15 +200,16 @@
       }
 
       function checkAnswer(event) {
-        const selectedIndex = parseInt(event.target.getAttribute('data-index'));
-        const currentQuestion = quizData[currentQuestionIndex];
-        const messageDiv = document.querySelector('.message');
-        
-        document.querySelectorAll('.answer-button').forEach(button => {
-          button.disabled = true;
-        });
+          // `parseInt()`を使って文字列を数値に変換する
+         const selectedIndex = parseInt(event.target.getAttribute('data-index'));
+         const currentQuestion = quizData[currentQuestionIndex];
+         const messageDiv = document.querySelector('.message');
 
-        if (selectedIndex === currentQuestion.seikai) {
+          document.querySelectorAll('.answer-button').forEach(button => {
+            button.disabled = true;
+          });
+
+        if (selectedIndex === parseInt(currentQuestion.seikai)) {
           event.target.classList.add('correct');
           messageDiv.textContent = '正解です！';
         } else {
@@ -216,7 +217,7 @@
           messageDiv.textContent = '不正解です。';
           document.querySelector(`[data-index="${currentQuestion.seikai}"]`).classList.add('correct');
         }
-        
+
         setTimeout(() => {
           currentQuestionIndex++;
           displayQuestion();
