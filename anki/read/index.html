@@ -126,18 +126,37 @@
             try {
               const content = event.target.result;
               const jsonObject = JSON.parse(content);
-              tempQuizData = tempQuizData.concat(jsonObject); // Assuming jsonObject is an array of questions
+              tempQuizData = tempQuizData.concat(jsonObject);
             } catch (error) {
               console.error(`❌ ファイル "${file.name}" の解析に失敗しました: ${error.message}`);
               logsDiv.innerHTML += `<div class="log-entry error">❌ ファイル "${file.name}" の解析に失敗しました。</div>`;
             } finally {
               completed++;
               if (completed === files.length) {
-                // すべてのファイルを読み込んだ後にシャッフル
-                quizData = tempQuizData.sort(() => Math.random() - 0.5);
+                // 問題の配列をシャッフル
+                const allQuestions = tempQuizData.sort(() => Math.random() - 0.5);
+                
+                // 各問題の選択肢をシャッフル
+                quizData = allQuestions.map(question => {
+                  const answers = question.answer;
+                  const originalCorrectAnswer = answers[question.seikai];
+                  
+                  // 選択肢をシャッフル
+                  const shuffledAnswers = answers.sort(() => Math.random() - 0.5);
+                  
+                  // シャッフル後の正解の新しいインデックスを特定
+                  const newCorrectIndex = shuffledAnswers.indexOf(originalCorrectAnswer);
+                  
+                  return {
+                    ...question,
+                    answer: shuffledAnswers,
+                    seikai: newCorrectIndex
+                  };
+                });
+                
                 currentQuestionIndex = 0;
                 displayQuestion();
-                console.log("すべてのファイルを読み込み、問題をシャッフルしました。", quizData);
+                console.log("すべてのファイルを読み込み、問題と選択肢をシャッフルしました。", quizData);
               }
             }
           };
@@ -181,25 +200,23 @@
       }
 
       function checkAnswer(event) {
-        const selectedIndex = event.target.getAttribute('data-index');
+        const selectedIndex = parseInt(event.target.getAttribute('data-index'));
         const currentQuestion = quizData[currentQuestionIndex];
         const messageDiv = document.querySelector('.message');
         
         document.querySelectorAll('.answer-button').forEach(button => {
-          button.disabled = true; // 回答後にボタンを無効化
+          button.disabled = true;
         });
 
-        if (selectedIndex == currentQuestion.seikai) {
+        if (selectedIndex === currentQuestion.seikai) {
           event.target.classList.add('correct');
           messageDiv.textContent = '正解です！';
         } else {
           event.target.classList.add('incorrect');
           messageDiv.textContent = '不正解です。';
-          // 正しい答えをハイライト
           document.querySelector(`[data-index="${currentQuestion.seikai}"]`).classList.add('correct');
         }
         
-        // 2秒後に次の問題を表示
         setTimeout(() => {
           currentQuestionIndex++;
           displayQuestion();
