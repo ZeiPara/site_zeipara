@@ -1,5 +1,6 @@
 window.onload = function() {
   const voice_list = [];
+  const voice_timing = [];
   const voice_string = "";
   for (const avoice in voice_list) {
     voice_string = voice_string + " " + voice_list;
@@ -43,7 +44,7 @@ function trimWav(wavBuffer, startTimeMs, endTimeMs) {
 // 使用例
 // ユーザーがボタンをクリックしたときの処理など
 document.getElementById('downloadButton').addEventListener('click', async () => {
-  const ifOK = False;
+  const ifOK = false;
   const content = document.getElementById("text").value;
   const contentx = contsnt;
   const voice_texts = [];
@@ -51,8 +52,14 @@ document.getElementById('downloadButton').addEventListener('click', async () => 
     let ranges = Array.from(Array(contentx.length), (v, k) => k);
     for (const i in ranges.reverse()) {
       if (voice_string.indexOf(contentx.slice(0, i)) != -1) {
-        voice_texts.push(voice_string.indexOf(contentx.slice(i)));
-        voice_textx = voice_texts.slice(i);
+        for (const i2 in Array.from(Array(i), (v, k) => k)) {
+          voice_texts.push(voice_string.indexOf(contentx.slice(i)) + i2);
+        }
+        if (voice_textx.length == i) {
+          ifOK = true;
+        } else {
+          voice_textx = voice_texts.slice(i);
+        }
         break;
       }
     }
