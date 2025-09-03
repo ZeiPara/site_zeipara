@@ -1,3 +1,11 @@
+window.onload = function() {
+  const voice_list = [];
+  const voice_string = "";
+  for (const avoice in voice_list) {
+    voice_string = voice_string + " " + voice_list;
+  }
+}
+
 function trimWav(wavBuffer, startTimeMs, endTimeMs) {
   // 1. WAVヘッダーの解析とデータの抽出
   const sampleRate = new DataView(wavBuffer).getUint32(24, true);
@@ -35,12 +43,26 @@ function trimWav(wavBuffer, startTimeMs, endTimeMs) {
 // 使用例
 // ユーザーがボタンをクリックしたときの処理など
 document.getElementById('downloadButton').addEventListener('click', async () => {
+  const ifOK = False;
+  const content = document.getElementById("text").value;
+  const contentx = contsnt;
+  const voice_texts = [];
+  While (ifOK) {
+    let ranges = Array.from(Array(contentx.length), (v, k) => k);
+    for (const i in ranges.reverse()) {
+      if (voice_string.indexOf(contentx.slice(0, i)) != -1) {
+        voice_texts.push(voice_string.indexOf(contentx.slice(i)));
+        voice_textx = voice_texts.slice(i);
+        break;
+      }
+    }
+  }
   // 例: Fetch APIで元のWAVファイルを取得
   const response = await fetch('your_audio_file.wav');
   const arrayBuffer = await response.arrayBuffer();
 
   // 切り抜き処理を実行し、ダウンロードURLを取得
-  const downloadUrl = trimWav(arrayBuffer, 1000, 5000); 
+  const downloadUrl = trimWav(arrayBuffer, 1000, 5000);
 
   // ダウンロードリンクをシミュレート
   const a = document.createElement('a');
