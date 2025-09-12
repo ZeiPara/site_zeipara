@@ -56,7 +56,7 @@ rotateSlider.addEventListener('input', updateOverlayStyle);
 // ---
 
 form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // これが最も重要です
 
     if (!videoFile || !imageFile) {
         alert('動画と画像を両方アップロードしてください。');
@@ -67,26 +67,30 @@ form.addEventListener('submit', async (e) => {
     downloadButton.textContent = '処理中...';
     downloadButton.disabled = true;
 
-    if (!ffmpeg.isLoaded()) {
-        await ffmpeg.load();
-    }
-
-    ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
-    ffmpeg.FS('writeFile', 'overlay.png', await fetchFile(imageFile));
-
-    const startTime = parseFloat(document.getElementById('start-time').value);
-    const endTime = parseFloat(document.getElementById('end-time').value);
-    const x = document.getElementById('x-slider').value;
-    const y = document.getElementById('y-slider').value;
-    const size = document.getElementById('size-slider').value; // サイズスライダーの値
-    const rotate = document.getElementById('rotate-slider').value;
-    const rotateInRadians = (rotate * Math.PI) / 180;
-
-    // 画像のサイズを調整するフィルタを追加
-    const scaleRatio = size / 100; // 100を基準とした比率
-    const filterComplex = `[1:v]scale=w=iw*${scaleRatio}:h=ih*${scaleRatio}[scaled];[scaled]rotate=${rotateInRadians}:c=none:ow=rotw(${rotateInRadians}):oh=roth(${rotateInRadians})[rotated];[0:v][rotated]overlay=${x}:${y}:enable='between(t,${startTime},${endTime})':shortest=1[v]`;
-
     try {
+        if (!ffmpeg.isLoaded()) {
+            await ffmpeg.load();
+        }
+
+        ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
+        ffmpeg.FS('writeFile', 'overlay.png', await fetchFile(imageFile));
+
+        const startTime = parseFloat(document.getElementById('start-time').value);
+        const endTime = parseFloat(document.getElementById('end-time').value);
+        const x = document.getElementById('x-slider').value;
+        const y = document.getElementById('y-slider').value;
+        const size = document.getElementById('size-slider').value;
+        const rotate = document.getElementById('rotate-slider').value;
+
+        // 画像のサイズと回転を同時に調整するフィルター
+        const scaleRatio = size / 100;
+        const rotateInRadians = (rotate * Math.PI) / 180;
+        
+        // フィルターコンプレックスの構築
+        const filterComplex = `[1:v]scale=w=iw*${scaleRatio}:h=ih*${scaleRatio}[scaled];` +
+                             `[scaled]rotate=${rotateInRadians}:c=none:ow=rotw(${rotateInRadians}):oh=roth(${rotateInRadians})[rotated];` +
+                             `[0:v][rotated]overlay=x=${x}:y=${y}:enable='between(t,${startTime},${endTime})':shortest=1[v]`;
+
         await ffmpeg.run(
             '-i', 'input.mp4',
             '-i', 'overlay.png',
@@ -115,7 +119,11 @@ form.addEventListener('submit', async (e) => {
     } finally {
         downloadButton.textContent = '動画をダウンロード';
         downloadButton.disabled = false;
-        ffmpeg.FS('unlink', 'input.mp4');
-        ffmpeg.FS('unlink', 'overlay.png');
+        try {
+            ffmpeg.FS('unlink', 'input.mp4');
+            ffmpeg.FS('unlink', 'overlay.png');
+        } catch (e) {
+            console.warn('ファイルのクリーンアップ中にエラーが発生しました。');
+        }
     }
 });
