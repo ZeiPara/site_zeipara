@@ -64,54 +64,42 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // ボタンを無効化し、処理中メッセージを表示
     const downloadButton = e.target.querySelector('button');
     downloadButton.textContent = '処理中...';
     downloadButton.disabled = true;
 
-    // FFmpegが読み込まれていない場合はロード
     if (!ffmpeg.isLoaded()) {
         await ffmpeg.load();
     }
 
-    // ファイルをFFmpegの仮想ファイルシステムに書き込み
     ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
     ffmpeg.FS('writeFile', 'overlay.png', await fetchFile(imageFile));
 
-    // ユーザー設定を取得
     const startTime = parseFloat(document.getElementById('start-time').value);
     const endTime = parseFloat(document.getElementById('end-time').value);
     const x = document.getElementById('x-slider').value;
     const y = document.getElementById('y-slider').value;
-    const size = document.getElementById('size-slider').value;
+    const size = document.getElementById('size-slider').value; // サイズスライダーの値
     const rotate = document.getElementById('rotate-slider').value;
-
-    // FFmpeg用の回転角度（ラジアン）を計算
     const rotateInRadians = (rotate * Math.PI) / 180;
 
-    // FFmpegの複雑なフィルタを作成
-    // [1:v]rotate=... : 画像（1番目の入力）を回転
-    // [0:v][rotated]overlay=... : 動画（0番目の入力）の上に回転した画像を重ねる
-    // enable='between(t,...)': 開始から終了秒数までフィルタを有効化
-    const filterComplex = `[1:v]rotate=${rotateInRadians}:c=none:ow=rotw(${rotateInRadians}):oh=roth(${rotateInRadians})[rotated];[0:v][rotated]overlay=${x}:${y}:enable='between(t,${startTime},${endTime})':shortest=1[v]`;
+    // 画像のサイズを調整するフィルタを追加
+    const scaleRatio = size / 100; // 100を基準とした比率
+    const filterComplex = `[1:v]scale=w=iw*${scaleRatio}:h=ih*${scaleRatio}[scaled];[scaled]rotate=${rotateInRadians}:c=none:ow=rotw(${rotateInRadians}):oh=roth(${rotateInRadians})[rotated];[0:v][rotated]overlay=${x}:${y}:enable='between(t,${startTime},${endTime})':shortest=1[v]`;
 
-    // FFmpegコマンドを実行
     try {
         await ffmpeg.run(
             '-i', 'input.mp4',
             '-i', 'overlay.png',
             '-filter_complex', filterComplex,
             '-map', '[v]',
-            '-map', '0:a?', // 元の動画の音声があればコピー
+            '-map', '0:a?',
             '-c:a', 'copy',
             'output.mp4'
         );
         console.log('FFmpegコマンドが正常に実行されました。');
 
-        // 出力ファイルを読み込み
         const data = ffmpeg.FS('readFile', 'output.mp4');
-
-        // ダウンロードリンクを作成
         const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
         const downloadUrl = URL.createObjectURL(videoBlob);
         const a = document.createElement('a');
@@ -126,10 +114,8 @@ form.addEventListener('submit', async (e) => {
         console.error('FFmpegの処理中にエラーが発生しました:', error);
         alert('動画の処理中にエラーが発生しました。コンソールを確認してください。');
     } finally {
-        // ボタンを有効化
         downloadButton.textContent = '動画をダウンロード';
         downloadButton.disabled = false;
-        // 仮想ファイルシステムをクリーンアップ
         ffmpeg.FS('unlink', 'input.mp4');
         ffmpeg.FS('unlink', 'overlay.png');
     }
