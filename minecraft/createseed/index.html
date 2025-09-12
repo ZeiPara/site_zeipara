@@ -2,13 +2,15 @@
 <html>
   <head>
     <title>シード値生成装置</title>
-    <link rel="stylesheet" href="/styles.css"> </head>
+    <link rel="stylesheet" href="https://zeipara.f5.si/styles.css"> </head>
   </head>
   <body>
-    <input type="text" id="text">
-    <input type="submit" onclick="create()" value="生成" />
-    <div id="result" class="result"></div>
-    <script src="/assets/js/load-header.js"></script>
+    <div class="content">
+      <input type="text" id="text">
+      <input type="submit" onclick="create()" value="生成" />
+      <div id="result" class="result"></div>
+    </div>
+    <script src="https://zeipara.f5.si/load-header.js"></script>
     <script>
       function create() {
         const input = document.getElementById("text").value;
