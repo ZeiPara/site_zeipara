@@ -1,4 +1,3 @@
-// FFmpegを初期化
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpeg = createFFmpeg({
     log: true,
