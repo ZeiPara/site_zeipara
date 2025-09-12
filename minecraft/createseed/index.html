@@ -8,10 +8,10 @@
   <div class="result"></div>
     <script>
       function create() {
-        const input = document.getWlementById("text").value;
+        const input = document.getElementById("text").value;
         let alltext = "";
         for (const i in [...Array(input.length).keys()]) {
-          alltext = alltext + str(input.codePointAt(i));
+          alltext = alltext + String(input.codePointAt(i));
         }
         while (20 < alltext.length) {
           let splited = alltext.split("");
@@ -22,9 +22,9 @@
           for (const ii in [...Array(splited.length).keys()]) {
             allsum = allsum + parseInt(splited.slice(ii, ii+1));
           }
-          allsum = parseInt(Strin(allsum)[-1]);
+          allsum = parseInt(String(allsum)[-1]);
           let after_str = "";
-          for (const ii in [...Array(splited.length / 3).keys()]) {
+          for (const ii in [...Array(Math.floor(splited.length / 3)).keys()]) {
             after_str = after_str + String(parseInt(splited[ii]) + parseInt(splited[ii+1]) + parseInt(splited[ii+2]) + allsum);
           }
           alltext = after_str;
