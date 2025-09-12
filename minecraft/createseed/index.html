@@ -3,34 +3,52 @@
   <head>
     <title>シード値生成装置</title>
   </head>
-  <input type="text" id="text">
-  <input type="submit" onclick="create()" value="生成" />
-  <div class="result"></div>
+  <body>
+    <input type="text" id="text">
+    <input type="submit" onclick="create()" value="生成" />
+    <div id="result" class="result"></div>
     <script>
       function create() {
         const input = document.getElementById("text").value;
         let alltext = "";
-        for (const i in [...Array(input.length).keys()]) {
-          alltext = alltext + String(input.codePointAt(i));
+        
+        // 配列の要素を正確に取得するため for...of ループに修正
+        for (const char of input) {
+          alltext += String(char.codePointAt(0));
         }
+
         while (20 < alltext.length) {
           let splited = alltext.split("");
-          for (const ii in [...Array(splited.length % 3).keys()]) {
+          
+          // 3の倍数になるように0をパディング
+          while (splited.length % 3 !== 0) {
             splited.push("0");
           }
+
           let allsum = 0;
-          for (const ii in [...Array(splited.length).keys()]) {
-            allsum = allsum + parseInt(splited.slice(ii, ii+1));
+          for (let i = 0; i < splited.length; i++) {
+            allsum += parseInt(splited[i]);
           }
-          allsum = parseInt(String(allsum)[-1]);
+
+          // 末尾の1桁を取得する正しい方法
+          const lastDigitOfSum = parseInt(String(allsum).slice(-1));
+
           let after_str = "";
-          for (const ii in [...Array(Math.floor(splited.length / 3)).keys()]) {
-            after_str = after_str + String(parseInt(splited[ii]) + parseInt(splited[ii+1]) + parseInt(splited[ii+2]) + allsum);
+          for (let i = 0; i < splited.length; i += 3) {
+            const groupSum = parseInt(splited[i]) + parseInt(splited[i + 1]) + parseInt(splited[i + 2]) + lastDigitOfSum;
+            after_str += String(groupSum);
           }
           alltext = after_str;
         }
-        const result = document.querySelector(".result");
-        result.innerHTML = `<p>${alltext}</p>`
+
+        let result1 = document.getElementById("result");
+        const result2 = alltext.split("");
+        let sum = result2.reduce(function(sum, element){
+          return sum + element;
+        }, 0);
+        alltext = parseInt(String(sum % 2 * 2 - 1) + String(alltext));
+        result.innerHTML = `<p>${alltext}</p>`;
       }
     </script>
+  </body>
 </html>
