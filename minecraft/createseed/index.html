@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>シード値生成装置</title>
+  </head>
+  <input type="text" id="text">
+  <submit onclick="create()" value="生成" />
+  <div class="result"></div>
+    <script>
+      function create() {
+        const input = document.getWlementById("text").value;
+        let alltext = "";
+        for (const i in [...Array(input.length).keys()]) {
+          alltext = alltext + str(input.codePointAt(i));
+        }
+        while (20 < alltext.length) {
+          let splited = alltext.split("");
+          for (const ii in [...Array(splited.length % 3).keys()]) {
+            splited.push("0");
+          }
+          let allsum = 0;
+          for (const ii in [...Array(splited.length).keys()]) {
+            allsum = allsum + parseInt(splited.slice(ii, ii+1));
+          }
+          allsum = parseInt(Strin(allsum)[-1]);
+          let after_str = "";
+          for (const ii in [...Array(splited.length / 3).keys()]) {
+            after_str = after_str + String(parseInt(splited[ii]) + parseInt(splited[ii+1]) + parseInt(splited[ii+2]) + allsum);
+          }
+          alltext = after_str;
+        }
+        const result = document.getElementById("result");
+        result.innerHTML = `<p>${alltext}</p>`
+      }
+    </script>
+</html>
