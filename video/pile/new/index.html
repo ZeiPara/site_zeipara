@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>動画に画像を重ねる</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        h1 { text-align: center; }
+        form div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"] { width: 100%; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .loading { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>動画に画像を重ねるツール</h1>
+    <form id="uploadForm">
+        <div>
+            <label for="video">動画ファイルを選択:</label>
+            <input type="file" id="video" name="video" accept="video/*" required>
+        </div>
+        <div>
+            <label for="image">重ねる画像ファイルを選択:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <button type="submit">動画を生成</button>
+    </form>
+    <div class="loading" id="loading">
+        <p>動画を処理中です...しばらくお待ちください。</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            
+            // ローディング表示
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('https://api.zeipara.f5.si/process-video', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('サーバーエラーが発生しました。');
+                }
+
+                // レスポンスからblobを取得し、ダウンロード
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'overlayed_video.mp4';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                alert('動画の生成が完了しました！');
+            } catch (error) {
+                console.error('エラー:', error);
+                alert('動画処理中にエラーが発生しました。');
+            } finally {
+                // ローディングを非表示
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
