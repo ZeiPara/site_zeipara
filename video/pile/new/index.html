@@ -2,75 +2,74 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>動画に画像を重ねる</title>
-    <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        h1 { text-align: center; }
-        form div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="file"] { width: 100%; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .loading { display: none; text-align: center; }
-    </style>
+    <title>動画に画像を重ねるツール</title>
 </head>
 <body>
     <h1>動画に画像を重ねるツール</h1>
     <form id="uploadForm">
         <div>
-            <label for="video">動画ファイルを選択:</label>
+            <label for="video">動画ファイル:</label>
             <input type="file" id="video" name="video" accept="video/*" required>
         </div>
         <div>
-            <label for="image">重ねる画像ファイルを選択:</label>
+            <label for="image">重ねる画像ファイル:</label>
             <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <div>
+            <label for="x">X座標:</label>
+            <input type="number" id="x" name="x" value="0">
+        </div>
+        <div>
+            <label for="y">Y座標:</label>
+            <input type="number" id="y" name="y" value="0">
+        </div>
+        <div>
+            <label for="angle">角度 (度):</label>
+            <input type="number" id="angle" name="angle" value="0">
+        </div>
+        <div>
+            <label for="scale">大きさ (倍率):</label>
+            <input type="number" step="0.1" id="scale" name="scale" value="1.0">
         </div>
         <button type="submit">動画を生成</button>
     </form>
-    <div class="loading" id="loading">
-        <p>動画を処理中です...しばらくお待ちください。</p>
-    </div>
+    <p id="status"></p>
 
     <script>
         const form = document.getElementById('uploadForm');
-        const loading = document.getElementById('loading');
+        const statusText = document.getElementById('status');
+        const API_URL = "https://your-render-app-name.onrender.com"; // RenderアプリのURLに置き換えてください
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            statusText.textContent = '動画を処理中です...';
 
             const formData = new FormData(form);
-            
-            // ローディング表示
-            loading.style.display = 'block';
 
             try {
-                const response = await fetch('https://api.zeipara.f5.si/process-video', {
+                const response = await fetch(`${API_URL}/process-video`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
 
-                if (!response.ok) {
-                    throw new Error('サーバーエラーが発生しました。');
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'output.mp4';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    statusText.textContent = '完了しました！';
+                } else {
+                    const errorData = await response.json();
+                    statusText.textContent = `エラー: ${errorData.error}`;
                 }
-
-                // レスポンスからblobを取得し、ダウンロード
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'overlayed_video.mp4';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                alert('動画の生成が完了しました！');
             } catch (error) {
-                console.error('エラー:', error);
-                alert('動画処理中にエラーが発生しました。');
-            } finally {
-                // ローディングを非表示
-                loading.style.display = 'none';
+                console.error(error);
+                statusText.textContent = '通信エラーが発生しました。';
             }
         });
     </script>
