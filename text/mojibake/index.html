@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>文字化け</title>
+  </head>
+  <body>
+    <input type="text" id="input">
+    ⇅
+    <input type="text" id="result">
+    <script>
+      document.getElementById("input").addEventListener("change", function() {
+        const input = document.getElementById("input").value;
+        const utf8Bytes = new TextEncoder().encode(input);
+        let result = '';
+        for (let byte of utf8Bytes) {
+          result += String.fromCharCode(byte); // Shift_JIS風に誤解釈
+        }
+        document.getElementById("result").value = result;
+      });
+    </script>
+  </body>
+</html>
