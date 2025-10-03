@@ -1,6 +1,8 @@
 let audio = new Audio();
 let loopInterval;
-const document.getElementById("stop")
+const start = document.getElementById("start");
+const stop = document.getElementById("stop");
+
 
 document.getElementById('fileInput').addEventListener('change', function(event) {
   const file = event.target.files[0];
@@ -11,6 +13,8 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
 });
 
 function startLoop() {
+  start.style.display = "none";
+  stop.style.display = "block";
   audio.currentTime = 0;
   audio.play();
   loopInterval = setInterval(() => {
@@ -20,6 +24,8 @@ function startLoop() {
 }
 
 function stopLoop() {
+  start.style.display = "block";
+  stop.style.display = "none";
   clearInterval(loopInterval);
   audio.pause();
 }
