@@ -2,9 +2,16 @@
 <html>
   <head>
     <title>音声ループ</title>
+    <style>
+      .stop {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <input type="file" id="fileInput">
     <script src="https://zeipara.f5.si/audio/loop/script.js"></script>
+    <span onclick="startLoop()">再生</span>
+    <span onclick="stopLoop()" id="stop">ストップ</span>
   </body>
 </html>
