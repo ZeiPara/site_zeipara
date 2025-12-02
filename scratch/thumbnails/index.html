@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>all thumbnails</title>
+    <style>
+      img {
+        gap: 10px;
+        width: 180px;
+        hight: auto;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let count = 0;
+      let elements = [];
+      for (let i = 1; i < 5; i++) {
+        elements.push(document.createElement("img", { src: "https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png" }));
+      }
+      for (const content in content) {
+          document.body.insertBefore(content, document.querySelector("body")[0]);
+      }
+      document.body.insertBefore(document.createElement("br"), document.querySelector("body")[0]);
+    </script>
+  </body>
+</html>
