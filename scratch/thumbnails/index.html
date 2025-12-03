@@ -27,16 +27,15 @@
         document.body.appendChild(img);
       }
       document.body.appendChild(document.createElement("br"));
-      const button = document.createElement("input");
-      button.type = "submit";
-      button.onclick = "clicked()";
+      const button = document.createElement("button");
+      button.onclick = clicked();
       document.body.appendChild(button);
       
       function clicked() {
         count += 1;
         const button2 = document.querySelector("input");
         button2.remove();
-        let elements = [];
+        elements = [];
         for (let i = 1; i < 6; i++) {
           const img = document.createElement("img");
           img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
@@ -46,9 +45,8 @@
           document.body.appendChild(img);
         }
         document.body.appendChild(document.createElement("br"));
-        const button = document.createElement("input");
-        button.type = "submit";
-        button.onclick = "clicked()";
+        const button = document.createElement("button");
+        button.onclick = clicked();
         document.body.appendChild(button);
       }
     </script>
