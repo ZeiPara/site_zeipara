@@ -18,7 +18,7 @@
     <script>
       let count = 0;
       let elements = [];
-      for (let i = 1; i < 5; i++) {
+      for (let i = 1; i < 6; i++) {
         const img = document.createElement("img");
         img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
         elements.push(img);
@@ -27,6 +27,30 @@
         document.body.appendChild(img);
       }
       document.body.appendChild(document.createElement("br"));
+      const button = document.createElement("input");
+      button.type = "submit";
+      button.onclick = "clicked()";
+      document.body.appendChild(button);
+      
+      function clicked() {
+        count += 1;
+        const button2 = document.querySelector("input");
+        button2.remove();
+        let elements = [];
+        for (let i = 1; i < 6; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+        const button = document.createElement("input");
+        button.type = "submit";
+        button.onclick = "clicked()";
+        document.body.appendChild(button);
+      }
     </script>
   </body>
 </html>
