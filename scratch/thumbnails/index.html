@@ -18,28 +18,94 @@
     <script>
       let count = 0;
       let elements = [];
-      for (let i = 1; i < 6; i++) {
+      for (let i = 1; i < 5; i++) {
         const img = document.createElement("img");
-        img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
+        img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
         elements.push(img);
       }
       for (const img of elements) {
         document.body.appendChild(img);
       }
       document.body.appendChild(document.createElement("br"));
+      count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+      count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+      count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
       const button = document.createElement("button");
       button.onclick = clicked;
       button.textContent = "もっと見る";
       document.body.appendChild(button);
       
       function clicked() {
-        count += 1;
         const button2 = document.querySelector("button");
         button2.remove();
+        count += 1;
         elements = [];
-        for (let i = 1; i < 6; i++) {
+        for (let i = 1; i < 5; i++) {
           const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+        count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+        count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
+          elements.push(img);
+        }
+        for (const img of elements) {
+          document.body.appendChild(img);
+        }
+        document.body.appendChild(document.createElement("br"));
+        count += 1;
+        elements = [];
+        for (let i = 1; i < 5; i++) {
+          const img = document.createElement("img");
+          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 4 + i}_307x246.png`;
           elements.push(img);
         }
         for (const img of elements) {
