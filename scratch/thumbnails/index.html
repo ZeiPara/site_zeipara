@@ -52,7 +52,7 @@
   div.appendChild(titleSpan);
 
   try {
-    const res = await fetch(`https://api.scratch.mit.edu/projects/${id}/`);
+    const res = await fetch(`https://corsproxy.io/?url=https://api.scratch.mit.edu/projects/${id}/`);
     if (!res.ok) {
       if (res.status === 404) {
         titleSpan.textContent = "<非共有>";
