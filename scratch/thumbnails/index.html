@@ -29,6 +29,7 @@
       document.body.appendChild(document.createElement("br"));
       const button = document.createElement("button");
       button.onclick = clicked();
+      button.value = "もっと見る";
       document.body.appendChild(button);
       
       function clicked() {
@@ -45,9 +46,10 @@
           document.body.appendChild(img);
         }
         document.body.appendChild(document.createElement("br"));
-        const button = document.createElement("button");
-        button.onclick = clicked();
-        document.body.appendChild(button);
+        const button3 = document.createElement("button");
+        button3.onclick = clicked();
+        button3.value = "もっと見る";
+        document.body.appendChild(button3);
       }
     </script>
   </body>
