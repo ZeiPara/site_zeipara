@@ -24,15 +24,20 @@
         color: #222;
         min-height: 1.6em;
       }
+      .more-btn-wrap {
+        display: block;
+        margin-top: 16px;
+      }
     </style>
   </head>
   <body>
+    <div id="thumbs-container"></div>
+    <div class="more-btn-wrap" id="more-btn-area"></div>
     <script>
       let count = 0;
-      const thumbsPerLoad = 4 * 5; // 4段×5枚
+      const thumbsPerLoad = 4 * 5;
       const thumbsEachRow = 5;
 
-      // サムネイル1枚＋タイトル表示の生成
       async function createThumbDiv(id) {
         const div = document.createElement('div');
         div.className = 'thumb-wrap';
@@ -46,7 +51,6 @@
         titleSpan.textContent = '...';
         div.appendChild(titleSpan);
 
-        // タイトル取得
         try {
           const res = await fetch(`https://api.scratch.mit.edu/projects/${id}/`);
           const data = await res.json();
@@ -60,38 +64,42 @@
         } catch (e) {
           titleSpan.textContent = "<取得失敗>";
         }
-
         return div;
       }
 
       // サムネイル群を追加表示
       async function addThumbnails() {
+        const thumbsContainer = document.getElementById("thumbs-container");
         for (let row = 0; row < 4; row++) {
           for (let i = 1; i <= thumbsEachRow; i++) {
             const id = count * thumbsPerLoad + row * thumbsEachRow + i;
             const thumbDiv = await createThumbDiv(id);
-            document.body.appendChild(thumbDiv);
+            thumbsContainer.appendChild(thumbDiv);
           }
-          document.body.appendChild(document.createElement("br"));
+          thumbsContainer.appendChild(document.createElement("br"));
         }
         count += 1;
       }
 
-      // 初回サムネイル群ロード
-      addThumbnails();
-
-      // ボタン生成
+      // ボタン生成（常に一番下）
       function createButton() {
+        const btnArea = document.getElementById("more-btn-area");
+        btnArea.innerHTML = ''; // 前のボタン消す
         const button = document.createElement("button");
         button.textContent = "もっと見る";
         button.onclick = async function() {
-          button.remove();
+          button.disabled = true;
           await addThumbnails();
-          createButton();
+          createButton(); // 再生成（最下部維持）
         };
-        document.body.appendChild(button);
+        btnArea.appendChild(button);
       }
-      createButton();
+
+      // 初回読み込み
+      (async()=>{
+        await addThumbnails();
+        createButton();
+      })();
     </script>
   </body>
 </html>
