@@ -3,114 +3,95 @@
   <head>
     <title>all thumbnails</title>
     <style>
+      .thumb-wrap {
+        display: inline-block;
+        margin: 10px;
+        vertical-align: top;
+        text-align: center;
+        width: 180px;
+      }
       img {
         width: 180px;
         height: auto;
-        margin: 10px; /* gapの代わり */
-        display: inline-block;
+        display: block;
+        margin: 0 auto 8px auto;
       }
       body {
         text-align: center;
+      }
+      .thumb-title {
+        font-size: 15px;
+        color: #222;
+        min-height: 1.6em;
       }
     </style>
   </head>
   <body>
     <script>
       let count = 0;
-      let elements = [];
-      for (let i = 1; i < 6; i++) {
-        const img = document.createElement("img");
-        img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-        elements.push(img);
+      const thumbsPerLoad = 4 * 5; // 4段×5枚
+      const thumbsEachRow = 5;
+
+      // サムネイル1枚＋タイトル表示の生成
+      async function createThumbDiv(id) {
+        const div = document.createElement('div');
+        div.className = 'thumb-wrap';
+
+        const img = document.createElement('img');
+        img.src = `https://uploads.scratch.mit.edu/get_image/project/${id}_307x246.png`;
+        div.appendChild(img);
+
+        const titleSpan = document.createElement('div');
+        titleSpan.className = 'thumb-title';
+        titleSpan.textContent = '...';
+        div.appendChild(titleSpan);
+
+        // タイトル取得
+        try {
+          const res = await fetch(`https://api.scratch.mit.edu/projects/${id}/`);
+          const data = await res.json();
+          if (data.code === "NotFound") {
+            titleSpan.textContent = "<非共有>";
+          } else if (typeof data.title === "string") {
+            titleSpan.textContent = data.title;
+          } else {
+            titleSpan.textContent = "<取得失敗>";
+          }
+        } catch (e) {
+          titleSpan.textContent = "<取得失敗>";
+        }
+
+        return div;
       }
-      for (const img of elements) {
-        document.body.appendChild(img);
+
+      // サムネイル群を追加表示
+      async function addThumbnails() {
+        for (let row = 0; row < 4; row++) {
+          for (let i = 1; i <= thumbsEachRow; i++) {
+            const id = count * thumbsPerLoad + row * thumbsEachRow + i;
+            const thumbDiv = await createThumbDiv(id);
+            document.body.appendChild(thumbDiv);
+          }
+          document.body.appendChild(document.createElement("br"));
+        }
+        count += 1;
       }
-      count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-      count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-      count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-        document.body.appendChild(document.createElement("br"));
-      const button = document.createElement("button");
-      button.onclick = clicked;
-      button.textContent = "もっと見る";
-      document.body.appendChild(button);
-      
-      function clicked() {
-        const button2 = document.querySelector("button");
-        button2.remove();
-        count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-        document.body.appendChild(document.createElement("br"));
-        count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-        count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-        count += 1;
-        elements = [];
-        for (let i = 1; i < 6; i++) {
-          const img = document.createElement("img");
-          img.src = `https://uploads.scratch.mit.edu/get_image/project/${count * 5 + i}_307x246.png`;
-          elements.push(img);
-        }
-        for (const img of elements) {
-          document.body.appendChild(img);
-        }
-        const button3 = document.createElement("button");
-        button3.onclick = clicked;
-        button3.textContent = "もっと見る";
-        document.body.appendChild(button3);
+
+      // 初回サムネイル群ロード
+      addThumbnails();
+
+      // ボタン生成
+      function createButton() {
+        const button = document.createElement("button");
+        button.textContent = "もっと見る";
+        button.onclick = async function() {
+          button.remove();
+          await addThumbnails();
+          createButton();
+        };
+        document.body.appendChild(button);
       }
+      createButton();
     </script>
   </body>
 </html>
